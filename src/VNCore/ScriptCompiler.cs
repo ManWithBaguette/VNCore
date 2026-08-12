@@ -2,26 +2,72 @@ using System.Text.Json;
 using VNCore.Dialogue;
 
 namespace VNCore.Compiler;
+
+enum State
+{
+    SettingSpeaker,
+    SettingText
+
+}
+
+
 public class ScriptCompiler
 {
     public void Compile(string filepath)
     {
         Dictionary<int, DialogueLine> lines = new Dictionary<int, DialogueLine>();
         
-        int currentLine = 0;
-        lines[currentLine] = new DialogueLine();
+        int currentLine = -1;
+        State state = State.SettingSpeaker;
+        string lineText = "";
+
         foreach (var line in File.ReadLines(filepath))
         {
-            if (string.IsNullOrWhiteSpace(line))
+            var trimmed = line.Trim();
+
+            if (string.IsNullOrWhiteSpace(trimmed))
+                continue;
+
+            switch (state)
             {
-                currentLine ++;
-            }
-            else
-            {
-                //lines[currentLine].Add(line);
+                case State.SettingSpeaker:
+                    if (trimmed.EndsWith(':'))
+                    {
+                        currentLine ++;
+                        lines[currentLine] = new DialogueLine {speaker = trimmed[..^1]};
+                        state = State.SettingText;
+                    }
+                    break;
+
+                case State.SettingText: // May need to reconsider formatting later when adding " into actual dialogue
+                    bool startsText = trimmed.StartsWith('"');
+                    bool endsText = trimmed.EndsWith('"');
+
+                    if (startsText && trimmed.Length > 1)
+                        trimmed = trimmed[1..];
+
+                    if (endsText && trimmed.Length > 0)
+                        trimmed = trimmed[..^1];
+
+                    lineText += (lineText.Length > 0 ? " " : "") + trimmed;
+
+                    if (endsText)
+                    {
+                        lines[currentLine].text = lineText;
+
+                        Console.WriteLine(
+                            $"Saving line {currentLine}: " +
+                            $"speaker='{lines[currentLine].speaker}', " +
+                            $"text='{lines[currentLine].text}'"
+                        );
+
+                        lineText = "";
+                        state = State.SettingSpeaker;
+                    }
+
+                    break;
             }
         }
-
         string json = JsonSerializer.Serialize(lines, JsonContext.Default.DictionaryInt32DialogueLine);
         string outputPath = Path.GetFullPath("output.json");
         Console.WriteLine(outputPath);
