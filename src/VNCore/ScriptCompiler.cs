@@ -1,15 +1,15 @@
 using System.Text.Json;
-using System.Text.Json.Serialization;
+using VNCore.Dialogue;
 
 namespace VNCore.Compiler;
 public class ScriptCompiler
 {
     public void Compile(string filepath)
     {
-        Dictionary<int, string> lines = new Dictionary<int, string>();
+        Dictionary<int, DialogueLine> lines = new Dictionary<int, DialogueLine>();
         
         int currentLine = 0;
-
+        lines[currentLine] = new DialogueLine();
         foreach (var line in File.ReadLines(filepath))
         {
             if (string.IsNullOrWhiteSpace(line))
@@ -18,23 +18,14 @@ public class ScriptCompiler
             }
             else
             {
-                lines[currentLine] = line;
+                //lines[currentLine].Add(line);
             }
         }
 
-        string json = JsonSerializer.Serialize(lines, JsonContext.Default.DictionaryInt32String);
+        string json = JsonSerializer.Serialize(lines, JsonContext.Default.DictionaryInt32DialogueLine);
         string outputPath = Path.GetFullPath("output.json");
         Console.WriteLine(outputPath);
         File.WriteAllText("output.json", json);
-    }
-}
-
-class Test
-{
-    static void Main()
-    {
-        var compiler = new ScriptCompiler();
-        compiler.Compile("test.txt");
     }
 }
 
