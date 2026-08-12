@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\Programming\\Projects\\VN-Core\\VNCore\\VNCore.csproj": {}
+    "E:\\Programming\\Projects\\VN-Core\\src\\VNCore\\VNCore.csproj": {}
   },
   "projects": {
-    "E:\\Programming\\Projects\\VN-Core\\VNCore\\VNCore.csproj": {
+    "E:\\Programming\\Projects\\VN-Core\\src\\VNCore\\VNCore.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\Programming\\Projects\\VN-Core\\VNCore\\VNCore.csproj",
+        "projectUniqueName": "E:\\Programming\\Projects\\VN-Core\\src\\VNCore\\VNCore.csproj",
         "projectName": "VNCore",
-        "projectPath": "E:\\Programming\\Projects\\VN-Core\\VNCore\\VNCore.csproj",
+        "projectPath": "E:\\Programming\\Projects\\VN-Core\\src\\VNCore\\VNCore.csproj",
         "packagesPath": "C:\\Users\\A\\.nuget\\packages\\",
-        "outputPath": "E:\\Programming\\Projects\\VN-Core\\VNCore\\obj\\",
+        "outputPath": "E:\\Programming\\Projects\\VN-Core\\src\\VNCore\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\A\\AppData\\Roaming\\NuGet\\NuGet.Config"

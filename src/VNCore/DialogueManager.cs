@@ -1,2 +1,2 @@
-namespace VNCore;
+// namespace VNCore;
 

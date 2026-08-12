@@ -1,0 +1,12 @@
+E:\Programming\Projects\VN-Core\src\VNCore\obj\Debug\net10.0\VNCore.GeneratedMSBuildEditorConfig.editorconfig
+E:\Programming\Projects\VN-Core\src\VNCore\obj\Debug\net10.0\VNCore.AssemblyInfoInputs.cache
+E:\Programming\Projects\VN-Core\src\VNCore\obj\Debug\net10.0\VNCore.AssemblyInfo.cs
+E:\Programming\Projects\VN-Core\src\VNCore\obj\Debug\net10.0\VNCore.csproj.CoreCompileInputs.cache
+E:\Programming\Projects\VN-Core\src\VNCore\obj\Debug\net10.0\VNCore.sourcelink.json
+E:\Programming\Projects\VN-Core\src\VNCore\bin\Debug\net10.0\VNCore.deps.json
+E:\Programming\Projects\VN-Core\src\VNCore\bin\Debug\net10.0\VNCore.dll
+E:\Programming\Projects\VN-Core\src\VNCore\bin\Debug\net10.0\VNCore.pdb
+E:\Programming\Projects\VN-Core\src\VNCore\obj\Debug\net10.0\VNCore.dll
+E:\Programming\Projects\VN-Core\src\VNCore\obj\Debug\net10.0\refint\VNCore.dll
+E:\Programming\Projects\VN-Core\src\VNCore\obj\Debug\net10.0\VNCore.pdb
+E:\Programming\Projects\VN-Core\src\VNCore\obj\Debug\net10.0\ref\VNCore.dll
