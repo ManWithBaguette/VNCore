@@ -1,0 +1,30 @@
+{
+    "1": {
+        "101": {
+            "Speaker": "Speaker Name",
+            "Text": "Dialogue Text Here",
+            "VNCore-Data": {
+                "Condition_1": {
+                    "paramater": "X>=1",
+                    "switch": "201"
+                }
+            },
+            "Meta-Data": {
+
+            }
+        }
+        
+    },
+    "2": {
+        "201": {
+            "Speaker": "Speaker Name",
+            "Text": "Dialogue Text Here",
+            "VNCore-Data": {
+            },
+            "Meta-Data": {
+
+            }
+        }
+    }
+
+}
