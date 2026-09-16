@@ -110,3 +110,4 @@ public class ScriptCompiler
 //  if: affinity=1, hate=1
 //      "choice 2 unlocks. when dialogue sees if, it checks condition using seperate function, probably need a condition check function in game to work properly
 //       if returns true, then reads the next tabbed line, otherwise it pretends they dont exist. for " it should treat multiple lines as the same type until the second " is found"
+// to make ^ easier, instead of adding ifs, might just make users duplicate the file and check in game conditions for which one is used.
