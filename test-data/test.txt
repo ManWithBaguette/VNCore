@@ -4,6 +4,9 @@ asdfasd
 aksdljf;alskd
 asdfasdfddd
 "
+Precondition: x>3
+a: csada
+annie: anger+3
 
 ASDAS:
 "ASDASDSA"

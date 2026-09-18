@@ -4,6 +4,9 @@
             "Speaker": "Speaker Name",
             "Text": "Dialogue Text Here",
             "VNCore-Data": {
+                "PreCondition": {
+                    "paramater": "X>=1"
+                },
                 "Condition_1": {
                     "paramater": "X>=1",
                     "switch": "201"

@@ -6,7 +6,8 @@ namespace VNCore.Compiler;
 enum State
 {
     SettingSpeaker,
-    SettingText
+    SettingText,
+    SettingLineData,
 
 }
 
@@ -30,12 +31,13 @@ public class ScriptCompiler
         {
             var trimmed = line.Trim();
 
-            if (string.IsNullOrWhiteSpace(trimmed))
-                continue;
 
             switch (state)
             {
                 case State.SettingSpeaker:
+                    if (string.IsNullOrWhiteSpace(trimmed))
+                        continue;
+
                     if (trimmed.EndsWith(':'))
                     {
                         lineId ++;
@@ -67,10 +69,27 @@ public class ScriptCompiler
                         );
 
                         lineText = "";
-                        state = State.SettingSpeaker;
+                        state = State.SettingLineData;
                     }
 
                     break;
+                case State.SettingLineData:
+                    if (string.IsNullOrWhiteSpace(trimmed))
+                        {
+                            state = State.SettingSpeaker;
+                            continue;
+                        }
+                    int colonIndex = trimmed.IndexOf(':');
+                    string flag = trimmed[..colonIndex].Trim();
+                    string paramater = trimmed[(colonIndex + 1)..].Trim();
+
+                    // Optionally remove VNCoreData and only have metadata, or add if cases here to sort between VNCoreData and other Metadata
+
+                    scene[branchId][lineId].VNCoreData[flag] = paramater;
+
+
+                    break;
+
             }
         }
         string json = JsonSerializer.Serialize(scene, JsonContext.Default.DictionaryInt32DictionaryInt32DialogueLine);

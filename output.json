@@ -3,14 +3,18 @@
     "0": {
       "speaker": "Nelson",
       "text": "MeepMerp asdfasd aksdljf;alskd asdfasdfddd ",
-      "VNCoreData": null,
-      "MetaData": null
+      "VNCoreData": {
+        "Precondition": "x\u003E3",
+        "a": "csada",
+        "annie": "anger\u002B3"
+      },
+      "MetaData": {}
     },
     "1": {
       "speaker": "ASDAS",
       "text": "ASDASDSA",
-      "VNCoreData": null,
-      "MetaData": null
+      "VNCoreData": {},
+      "MetaData": {}
     }
   }
 }
