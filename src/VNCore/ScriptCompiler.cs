@@ -18,8 +18,11 @@ public class ScriptCompiler
         Dictionary<int, Dictionary<int, DialogueLine>> scene = new Dictionary<int, Dictionary<int, DialogueLine>>();
         Dictionary<int, DialogueLine> lines = new Dictionary<int, DialogueLine>();
 
-        int branchId = 0;
+        int branchId = 1;
         int lineId = -1;
+
+        scene[branchId] = lines;
+
         State state = State.SettingSpeaker;
         string lineText = "";
 
@@ -55,12 +58,12 @@ public class ScriptCompiler
 
                     if (endsText)
                     {
-                        lines[lineId].text = lineText;
+                        scene[branchId][lineId].text = lineText;
 
                         Console.WriteLine(
                             $"Saving line {lineId}: " +
-                            $"speaker='{lines[lineId].speaker}', " +
-                            $"text='{lines[lineId].text}'"
+                            $"speaker='{scene[branchId][lineId].speaker}', " +
+                            $"text='{scene[branchId][lineId].text}'"
                         );
 
                         lineText = "";
@@ -70,7 +73,7 @@ public class ScriptCompiler
                     break;
             }
         }
-        string json = JsonSerializer.Serialize(lines, JsonContext.Default.DictionaryInt32DialogueLine);
+        string json = JsonSerializer.Serialize(scene, JsonContext.Default.DictionaryInt32DictionaryInt32DialogueLine);
         string outputPath = Path.GetFullPath("output.json");
         Console.WriteLine(outputPath);
         File.WriteAllText("output.json", json);
