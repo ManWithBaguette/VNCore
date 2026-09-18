@@ -6,13 +6,28 @@
       "VNCoreData": {
         "Precondition": "x\u003E3",
         "a": "csada",
-        "annie": "anger\u002B3"
+        "annie": "anger\u002B3",
+        "switch": "test-data/test1.txt"
       },
       "MetaData": {}
     },
     "1": {
       "speaker": "ASDAS",
       "text": "ASDASDSA",
+      "VNCoreData": {},
+      "MetaData": {}
+    }
+  },
+  "2": {
+    "0": {
+      "speaker": "John",
+      "text": "123456",
+      "VNCoreData": {},
+      "MetaData": {}
+    },
+    "1": {
+      "speaker": "Bill",
+      "text": "Me too",
       "VNCoreData": {},
       "MetaData": {}
     }
