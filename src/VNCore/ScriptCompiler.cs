@@ -15,11 +15,11 @@ public class ScriptCompiler
 {
     public void Compile(string filepath)
     {
-        Dictionary<int, DialogueLine> track = new Dictionary<int, DialogueLine>();
+        Dictionary<int, Dictionary<int, DialogueLine>> scene = new Dictionary<int, Dictionary<int, DialogueLine>>();
         Dictionary<int, DialogueLine> lines = new Dictionary<int, DialogueLine>();
 
-        int currentTrack = 0;
-        int currentLine = -1;
+        int branchId = 0;
+        int lineId = -1;
         State state = State.SettingSpeaker;
         string lineText = "";
 
@@ -35,8 +35,8 @@ public class ScriptCompiler
                 case State.SettingSpeaker:
                     if (trimmed.EndsWith(':'))
                     {
-                        currentLine ++;
-                        lines[currentLine] = new DialogueLine {speaker = trimmed[..^1]};
+                        lineId ++;
+                        lines[lineId] = new DialogueLine {speaker = trimmed[..^1]};
                         state = State.SettingText;
                     }
                     break;
@@ -55,12 +55,12 @@ public class ScriptCompiler
 
                     if (endsText)
                     {
-                        lines[currentLine].text = lineText;
+                        lines[lineId].text = lineText;
 
                         Console.WriteLine(
-                            $"Saving line {currentLine}: " +
-                            $"speaker='{lines[currentLine].speaker}', " +
-                            $"text='{lines[currentLine].text}'"
+                            $"Saving line {lineId}: " +
+                            $"speaker='{lines[lineId].speaker}', " +
+                            $"text='{lines[lineId].text}'"
                         );
 
                         lineText = "";

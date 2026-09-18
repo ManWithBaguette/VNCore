@@ -4,5 +4,7 @@ public class DialogueLine
 {
     public string speaker { get; set; } = "";
     public string text { get; set; } = "";
+    public Dictionary<string, string>? VNCoreData { get; set; }
+    public Dictionary<string, string>? MetaData { get; set; }
 
 }

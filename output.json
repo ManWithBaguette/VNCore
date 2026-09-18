@@ -1,10 +1,14 @@
 {
   "0": {
     "speaker": "Nelson",
-    "text": "MeepMerp asdfasd aksdljf;alskd asdfasdfddd "
+    "text": "MeepMerp asdfasd aksdljf;alskd asdfasdfddd ",
+    "VNCoreData": null,
+    "MetaData": null
   },
   "1": {
     "speaker": "ASDAS",
-    "text": "ASDASDSA"
+    "text": "ASDASDSA",
+    "VNCoreData": null,
+    "MetaData": null
   }
 }
