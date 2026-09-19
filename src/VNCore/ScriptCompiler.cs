@@ -42,6 +42,7 @@ public class ScriptCompiler
             Dictionary<int, DialogueLine> lines = new Dictionary<int, DialogueLine>();
             scene[branchId] = lines;
             state = State.SettingSpeaker;
+            lineId = -1;
         
             foreach (var line in File.ReadLines(fileQueue.Dequeue()))
             {
@@ -65,42 +66,15 @@ public class ScriptCompiler
 
                     case State.SettingText: // May need to reconsider formatting later when adding " into actual dialogue. Also modify later so can also start on the same line as speaker: i.e. Nelson: LineText
                         // Consider making anything that comes after the speaker name text. add a seperate stop condition for ending the line text and transitioning into metadata collection
-                        bool startsText = trimmed.StartsWith('"');
-                        bool endsText = trimmed.EndsWith('"');
-
-                        if (startsText && trimmed.Length > 1)
-                            trimmed = trimmed[1..];
-
-                        if (endsText && trimmed.Length > 0)
-                            trimmed = trimmed[..^1];
-
-                        lineText += (lineText.Length > 0 ? " " : "") + trimmed;
-
-                        if (endsText)
-                        {
-                            scene[branchId][lineId].Text = lineText;
-
-                            Console.WriteLine(
-                                $"Saving line {lineId}: " +
-                                $"speaker='{scene[branchId][lineId].Speaker}', " +
-                                $"text='{scene[branchId][lineId].Text}'"
-                            );
-
-                            lineText = "";
-                            state = State.SettingLineData;
-                        }
-                        Console.WriteLine("Text Set");
+                        SetText(trimmed);
                         break;
                     
                     case State.SettingLineData:
 
                         // Optionally remove VNCoreData and only have metadata, or add if cases here to sort between VNCoreData and other Metadata
                         // Consider making a conditional dictionary nested inside the metadata dictionaries for if cases in metadata. i.e. if x, anne: anger+3
-                        if (!string.IsNullOrWhiteSpace(line))
-                            SetData(trimmed);
-                        else
-                            state = State.SettingSpeaker;
-
+                        SetData(trimmed);
+                        
                         Console.WriteLine("LineData Set");
                         break;
 
@@ -111,9 +85,10 @@ public class ScriptCompiler
 
                         break;
                     case State.SettingChoiceText:
-
+                        SetText(trimmed);
                         break;
                     case State.SettingChoiceData:
+                        SetData(trimmed);
                         break;
 
                 }
@@ -128,9 +103,45 @@ public class ScriptCompiler
 
     private void SetText(string line)
     {
+        bool startsText = line.StartsWith('"');
+        bool endsText = line.EndsWith('"');
+
+        if (startsText && line.Length > 1)
+            line = line[1..];
+
+        if (endsText && line.Length > 0)
+            line = line[..^1];
+
+        lineText += (lineText.Length > 0 ? " " : "") + line;
+
+        if (endsText)
+        {
+            if (state == State.SettingText) {
+                scene[branchId][lineId].Text = lineText;
+                state = State.SettingLineData;
+            }   else if (state == State.SettingChoiceText) {
+                scene[branchId][lineId].Choices[choiceId].Text = lineText;
+                state = State.SettingChoiceData;
+            }
+            
+            Console.WriteLine(
+                $"Saving line {lineId}: " +
+                $"speaker='{scene[branchId][lineId].Speaker}', " +
+                $"text='{scene[branchId][lineId].Text}'"
+            );
+
+            lineText = "";
+        }
+        Console.WriteLine("Text Set");
     }
     private void SetData(string line)
     {
+        if (string.IsNullOrWhiteSpace(line))
+        {
+            state = State.SettingSpeaker;
+            return;
+        }
+
         int colonIndex = line.IndexOf(':');
         string flag = line[..colonIndex].Trim();
         string paramater = line[(colonIndex + 1)..].Trim();

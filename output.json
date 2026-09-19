@@ -1,11 +1,14 @@
 {
   "1": {
-    "1": {
+    "0": {
       "Speaker": "Nelson",
       "Choices": {
         "1": {
-          "Text": "",
-          "VNCoreData": {},
+          "Text": "1: abcdefghijk",
+          "VNCoreData": {
+            "Precondition": "x\u003C4",
+            "2": ""
+          },
           "Metadata": {}
         }
       },
@@ -17,17 +20,24 @@
         "switch": "test-data/test1.txt"
       },
       "Metadata": {}
+    },
+    "1": {
+      "Speaker": "ASDAS",
+      "Choices": {},
+      "Text": "ASDASDSA",
+      "VNCoreData": {},
+      "Metadata": {}
     }
   },
   "2": {
-    "2": {
+    "0": {
       "Speaker": "John",
       "Choices": {},
       "Text": "123456",
       "VNCoreData": {},
       "Metadata": {}
     },
-    "3": {
+    "1": {
       "Speaker": "Bill",
       "Choices": {},
       "Text": "Me too",
