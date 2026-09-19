@@ -22,6 +22,7 @@ public class ScriptCompiler
         Queue<string> fileQueue = new Queue<string>();
         fileQueue.Enqueue(filepath);
 
+        List<string> compiledFiles = [filepath];
 
         int branchId = 1;
 
@@ -113,7 +114,11 @@ public class ScriptCompiler
 
                             switch (flag) {
                                 case "switch":
+                                    if (!compiledFiles.Contains(paramater))
+                                    {
                                         fileQueue.Enqueue(paramater);
+                                        compiledFiles.Add(paramater);
+                                    }
                                     break;
                                 case "choice":
                                     settingChoice = 1;
