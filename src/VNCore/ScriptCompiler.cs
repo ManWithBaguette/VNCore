@@ -8,34 +8,41 @@ enum State
     SettingSpeaker,
     SettingText,
     SettingLineData,
+    SettingChoice,
+    SettingChoiceText,
+    SettingChoiceData,
 
 }
 
 
 public class ScriptCompiler
 {
+    private Dictionary<int, Dictionary<int, DialogueLine>> scene = [];
+    private Queue<string> fileQueue = new();
+    private List<string> compiledFiles = new();
+    private int branchId;
+    private string lineText = "";
+    private int lineId;
+    private int choiceId;
+
+    private State state;
+
     public void Compile(string filepath)
     {
-        Dictionary<int, Dictionary<int, DialogueLine>> scene = new Dictionary<int, Dictionary<int, DialogueLine>>();
-        
-        Queue<string> fileQueue = new Queue<string>();
+        scene = new Dictionary<int, Dictionary<int, DialogueLine>>();
+        fileQueue = new Queue<string>();
         fileQueue.Enqueue(filepath);
 
-        List<string> compiledFiles = [filepath];
+        compiledFiles.Add(filepath);
 
-        int branchId = 1;
-
+        branchId = 1;
 
         while (fileQueue.Count > 0)
         {   
             Dictionary<int, DialogueLine> lines = new Dictionary<int, DialogueLine>();
             scene[branchId] = lines;
-            State state = State.SettingSpeaker;
-            string lineText = "";
-            int lineId = -1;
-            int settingChoice = 0;
-
-
+            state = State.SettingSpeaker;
+        
             foreach (var line in File.ReadLines(fileQueue.Dequeue()))
             {
                 var trimmed = line.Trim();
@@ -71,15 +78,7 @@ public class ScriptCompiler
 
                         if (endsText)
                         {
-                            if (settingChoice > 0)
-                            {
-                                
-                            }
-
-
                             scene[branchId][lineId].Text = lineText;
-
-
 
                             Console.WriteLine(
                                 $"Saving line {lineId}: " +
@@ -94,52 +93,27 @@ public class ScriptCompiler
                         break;
                     
                     case State.SettingLineData:
-                        if (string.IsNullOrWhiteSpace(trimmed))
-                            {
-                                state = State.SettingSpeaker;
-                                continue;
-                            }
-                        int colonIndex = trimmed.IndexOf(':');
-                        string flag = trimmed[..colonIndex].Trim();
-                        string paramater = trimmed[(colonIndex + 1)..].Trim();
 
                         // Optionally remove VNCoreData and only have metadata, or add if cases here to sort between VNCoreData and other Metadata
                         // Consider making a conditional dictionary nested inside the metadata dictionaries for if cases in metadata. i.e. if x, anne: anger+3
-                        
-                        if (settingChoice == 0)
-                        {
-                            
-                            scene[branchId][lineId].VNCoreData[flag] = paramater;
-
-                            switch (flag) {
-                                case "switch":
-                                    if (!compiledFiles.Contains(paramater))
-                                    {
-                                        fileQueue.Enqueue(paramater);
-                                        compiledFiles.Add(paramater);
-                                    }
-                                    break;
-                                case "choice":
-                                    settingChoice = 1;
-                                    scene[branchId][lineId].Choices[settingChoice] = new DialogueLine();
-                                    state = State.SettingText;
-                                    break;
-                            }
-                        } else
-                        {
-                            if (int.TryParse(flag, out int value))
-                            {
-                                settingChoice ++;
-                                scene[branchId][lineId].Choices[settingChoice] = new DialogueLine();
-                            }
-
-                            scene[branchId][lineId].Choices[settingChoice].VNCoreData[flag] = paramater;
-
-                        }
-
-
+                        if (!string.IsNullOrWhiteSpace(line))
+                            SetData(trimmed);
+                        else
+                            state = State.SettingSpeaker;
 
                         Console.WriteLine("LineData Set");
+                        break;
+
+                    case State.SettingChoice:
+                        choiceId ++;
+                        scene[branchId][lineId].Choices[choiceId] = new DialogueElement();
+                        state = State.SettingChoiceText;
+
+                        break;
+                    case State.SettingChoiceText:
+
+                        break;
+                    case State.SettingChoiceData:
                         break;
 
                 }
@@ -151,7 +125,44 @@ public class ScriptCompiler
         Console.WriteLine(outputPath);
         File.WriteAllText("output.json", json);
     }
+
+    private void SetText(string line)
+    {
+    }
+    private void SetData(string line)
+    {
+        int colonIndex = line.IndexOf(':');
+        string flag = line[..colonIndex].Trim();
+        string paramater = line[(colonIndex + 1)..].Trim();
+        
+        switch (flag) {
+            case "switch":
+                if (!compiledFiles.Contains(paramater))
+                {
+                    fileQueue.Enqueue(paramater);
+                    compiledFiles.Add(paramater);
+                }
+                break;
+            case "choice":
+                if (state == State.SettingLineData)
+                {
+                    choiceId ++;
+                    scene[branchId][lineId].Choices[choiceId] = new DialogueLine();
+                    state = State.SettingChoiceText;
+                }
+                break;
+        }
+
+        if (state == State.SettingLineData)
+            scene[branchId][lineId].VNCoreData[flag] = paramater;
+        else if (state == State.SettingChoiceData)
+            scene[branchId][lineId].Choices[choiceId].VNCoreData[flag] = paramater;
+
+    }
 }
+
+
+
 
 // Alice: 
 // "Hello."
