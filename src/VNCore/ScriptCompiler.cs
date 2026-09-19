@@ -1,5 +1,4 @@
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using VNCore.Dialogue;
 
 namespace VNCore.Compiler;
@@ -51,7 +50,7 @@ public class ScriptCompiler
                         if (trimmed.EndsWith(':'))
                         {
                             lineId ++;
-                            lines[lineId] = new DialogueLine {speaker = trimmed[..^1]};
+                            lines[lineId] = new DialogueLine {Speaker = trimmed[..^1]};
                             state = State.SettingText;
                         }
                         Console.WriteLine("Speaker Set");
@@ -78,14 +77,14 @@ public class ScriptCompiler
                             }
 
 
-                            scene[branchId][lineId].text = lineText;
+                            scene[branchId][lineId].Text = lineText;
 
 
 
                             Console.WriteLine(
                                 $"Saving line {lineId}: " +
-                                $"speaker='{scene[branchId][lineId].speaker}', " +
-                                $"text='{scene[branchId][lineId].text}'"
+                                $"speaker='{scene[branchId][lineId].Speaker}', " +
+                                $"text='{scene[branchId][lineId].Text}'"
                             );
 
                             lineText = "";

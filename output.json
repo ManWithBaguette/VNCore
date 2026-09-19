@@ -1,8 +1,28 @@
 {
   "1": {
     "0": {
-      "speaker": "Nelson",
-      "text": "1: abcdefghijk",
+      "Speaker": "Nelson",
+      "Choices": {
+        "1": {
+          "Speaker": "",
+          "Choices": {},
+          "Text": "",
+          "VNCoreData": {
+            "Precondition": "x\u003C4"
+          },
+          "Metadata": {}
+        },
+        "2": {
+          "Speaker": "",
+          "Choices": {},
+          "Text": "",
+          "VNCoreData": {
+            "2": ""
+          },
+          "Metadata": {}
+        }
+      },
+      "Text": "1: abcdefghijk",
       "VNCoreData": {
         "Precondition": "x\u003E3",
         "a": "csada",
@@ -10,50 +30,30 @@
         "switch": "test-data/test1.txt",
         "choice": ""
       },
-      "MetaData": {},
-      "Choices": {
-        "1": {
-          "speaker": "",
-          "text": "",
-          "VNCoreData": {
-            "Precondition": "x\u003C4"
-          },
-          "MetaData": {},
-          "Choices": {}
-        },
-        "2": {
-          "speaker": "",
-          "text": "",
-          "VNCoreData": {
-            "2": ""
-          },
-          "MetaData": {},
-          "Choices": {}
-        }
-      }
+      "Metadata": {}
     },
     "1": {
-      "speaker": "ASDAS",
-      "text": "ASDASDSA",
+      "Speaker": "ASDAS",
+      "Choices": {},
+      "Text": "ASDASDSA",
       "VNCoreData": {},
-      "MetaData": {},
-      "Choices": {}
+      "Metadata": {}
     }
   },
   "2": {
     "0": {
-      "speaker": "John",
-      "text": "123456",
+      "Speaker": "John",
+      "Choices": {},
+      "Text": "123456",
       "VNCoreData": {},
-      "MetaData": {},
-      "Choices": {}
+      "Metadata": {}
     },
     "1": {
-      "speaker": "Bill",
-      "text": "Me too",
+      "Speaker": "Bill",
+      "Choices": {},
+      "Text": "Me too",
       "VNCoreData": {},
-      "MetaData": {},
-      "Choices": {}
+      "Metadata": {}
     }
   }
 }

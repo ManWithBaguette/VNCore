@@ -1,11 +1,7 @@
 namespace VNCore.Dialogue;
 
-public class DialogueLine
+public class DialogueLine : DialogueElement
 {
-    public string speaker { get; set; } = "";
-    public string text { get; set; } = "";
-    public Dictionary<string, string> VNCoreData { get; set; } = new();
-    public Dictionary<string, string> MetaData { get; set; } = new();
+    public string Speaker { get; set; } = "";
     public Dictionary<int, DialogueLine> Choices { get; set; } = new();
-
 }
