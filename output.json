@@ -2,20 +2,42 @@
   "1": {
     "0": {
       "speaker": "Nelson",
-      "text": "MeepMerp asdfasd aksdljf;alskd asdfasdfddd ",
+      "text": "1: abcdefghijk",
       "VNCoreData": {
         "Precondition": "x\u003E3",
         "a": "csada",
         "annie": "anger\u002B3",
-        "switch": "test-data/test1.txt"
+        "switch": "test-data/test1.txt",
+        "choice": ""
       },
-      "MetaData": {}
+      "MetaData": {},
+      "Choices": {
+        "1": {
+          "speaker": "",
+          "text": "",
+          "VNCoreData": {
+            "Precondition": "x\u003C4"
+          },
+          "MetaData": {},
+          "Choices": {}
+        },
+        "2": {
+          "speaker": "",
+          "text": "",
+          "VNCoreData": {
+            "2": ""
+          },
+          "MetaData": {},
+          "Choices": {}
+        }
+      }
     },
     "1": {
       "speaker": "ASDAS",
       "text": "ASDASDSA",
       "VNCoreData": {},
-      "MetaData": {}
+      "MetaData": {},
+      "Choices": {}
     }
   },
   "2": {
@@ -23,13 +45,15 @@
       "speaker": "John",
       "text": "123456",
       "VNCoreData": {},
-      "MetaData": {}
+      "MetaData": {},
+      "Choices": {}
     },
     "1": {
       "speaker": "Bill",
       "text": "Me too",
       "VNCoreData": {},
-      "MetaData": {}
+      "MetaData": {},
+      "Choices": {}
     }
   }
 }

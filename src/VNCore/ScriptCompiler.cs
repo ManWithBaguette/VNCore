@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using VNCore.Dialogue;
 
 namespace VNCore.Compiler;
@@ -32,6 +33,8 @@ public class ScriptCompiler
             State state = State.SettingSpeaker;
             string lineText = "";
             int lineId = -1;
+            int settingChoice = 0;
+
 
             foreach (var line in File.ReadLines(fileQueue.Dequeue()))
             {
@@ -50,6 +53,7 @@ public class ScriptCompiler
                             lines[lineId] = new DialogueLine {speaker = trimmed[..^1]};
                             state = State.SettingText;
                         }
+                        Console.WriteLine("Speaker Set");
                         break;
 
                     case State.SettingText: // May need to reconsider formatting later when adding " into actual dialogue. Also modify later so can also start on the same line as speaker: i.e. Nelson: LineText
@@ -67,7 +71,15 @@ public class ScriptCompiler
 
                         if (endsText)
                         {
+                            if (settingChoice > 0)
+                            {
+                                
+                            }
+
+
                             scene[branchId][lineId].text = lineText;
+
+
 
                             Console.WriteLine(
                                 $"Saving line {lineId}: " +
@@ -78,8 +90,9 @@ public class ScriptCompiler
                             lineText = "";
                             state = State.SettingLineData;
                         }
-
+                        Console.WriteLine("Text Set");
                         break;
+                    
                     case State.SettingLineData:
                         if (string.IsNullOrWhiteSpace(trimmed))
                             {
@@ -92,15 +105,37 @@ public class ScriptCompiler
 
                         // Optionally remove VNCoreData and only have metadata, or add if cases here to sort between VNCoreData and other Metadata
                         // Consider making a conditional dictionary nested inside the metadata dictionaries for if cases in metadata. i.e. if x, anne: anger+3
-                        scene[branchId][lineId].VNCoreData[flag] = paramater;
-
-                        if (flag == "switch")
+                        
+                        if (settingChoice == 0)
                         {
-                            fileQueue.Enqueue(paramater);
-                            Console.WriteLine(flag);
-                            Console.WriteLine(paramater);
+                            
+                            scene[branchId][lineId].VNCoreData[flag] = paramater;
+
+                            switch (flag) {
+                                case "switch":
+                                        fileQueue.Enqueue(paramater);
+                                    break;
+                                case "choice":
+                                    settingChoice = 1;
+                                    scene[branchId][lineId].Choices[settingChoice] = new DialogueLine();
+                                    state = State.SettingText;
+                                    break;
+                            }
+                        } else
+                        {
+                            if (int.TryParse(flag, out int value))
+                            {
+                                settingChoice ++;
+                                scene[branchId][lineId].Choices[settingChoice] = new DialogueLine();
+                            }
+
+                            scene[branchId][lineId].Choices[settingChoice].VNCoreData[flag] = paramater;
+
                         }
 
+
+
+                        Console.WriteLine("LineData Set");
                         break;
 
                 }

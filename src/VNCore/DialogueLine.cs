@@ -6,5 +6,6 @@ public class DialogueLine
     public string text { get; set; } = "";
     public Dictionary<string, string> VNCoreData { get; set; } = new();
     public Dictionary<string, string> MetaData { get; set; } = new();
+    public Dictionary<int, DialogueLine> Choices { get; set; } = new();
 
 }
