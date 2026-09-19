@@ -1,5 +1,5 @@
 Nelson:
-"MeepMerp
+11"MeepMerp
 asdfasd
 aksdljf;alskd
 asdfasdfddd
@@ -9,10 +9,14 @@ a: csada
 annie: anger+3
 switch: test-data/test1.txt
 choice:
-    1: 
+    1:
     "abcdefghijk"
     Precondition: x<4
     2:
+    "ffffff"
+    Condition: 2
+
+
 
 ASDAS:
 "ASDASDSA"

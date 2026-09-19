@@ -2,47 +2,53 @@
   "1": {
     "0": {
       "Speaker": "Nelson",
-      "Choices": {
-        "1": {
-          "Text": "1: abcdefghijk",
-          "VNCoreData": {
-            "Precondition": "x\u003C4",
-            "2": ""
-          },
-          "Metadata": {}
-        }
-      },
-      "Text": "MeepMerp asdfasd aksdljf;alskd asdfasdfddd ",
+      "Text": "11\u0022MeepMerp asdfasd aksdljf;alskd asdfasdfddd ",
       "VNCoreData": {
         "Precondition": "x\u003E3",
         "a": "csada",
         "annie": "anger\u002B3",
         "switch": "test-data/test1.txt"
       },
-      "Metadata": {}
+      "Metadata": {},
+      "Choices": {
+        "1": {
+          "Text": "abcdefghijk",
+          "VNCoreData": {
+            "Precondition": "x\u003C4"
+          },
+          "Metadata": {}
+        },
+        "2": {
+          "Text": "ffffff",
+          "VNCoreData": {
+            "Condition": "2"
+          },
+          "Metadata": {}
+        }
+      }
     },
     "1": {
       "Speaker": "ASDAS",
-      "Choices": {},
       "Text": "ASDASDSA",
       "VNCoreData": {},
-      "Metadata": {}
+      "Metadata": {},
+      "Choices": {}
     }
   },
   "2": {
     "0": {
       "Speaker": "John",
-      "Choices": {},
       "Text": "123456",
       "VNCoreData": {},
-      "Metadata": {}
+      "Metadata": {},
+      "Choices": {}
     },
     "1": {
       "Speaker": "Bill",
-      "Choices": {},
       "Text": "Me too",
       "VNCoreData": {},
-      "Metadata": {}
+      "Metadata": {},
+      "Choices": {}
     }
   }
 }

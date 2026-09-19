@@ -75,7 +75,6 @@ public class ScriptCompiler
                         // Consider making a conditional dictionary nested inside the metadata dictionaries for if cases in metadata. i.e. if x, anne: anger+3
                         SetData(trimmed);
                         
-                        Console.WriteLine("LineData Set");
                         break;
 
                     case State.SettingChoice:
@@ -119,8 +118,9 @@ public class ScriptCompiler
             if (state == State.SettingText) {
                 scene[branchId][lineId].Text = lineText;
                 state = State.SettingLineData;
-            }   else if (state == State.SettingChoiceText) {
+            } else if (state == State.SettingChoiceText) {
                 scene[branchId][lineId].Choices[choiceId].Text = lineText;
+                Console.WriteLine($"Choice Text: {lineText}");
                 state = State.SettingChoiceData;
             }
             
@@ -146,28 +146,30 @@ public class ScriptCompiler
         string flag = line[..colonIndex].Trim();
         string paramater = line[(colonIndex + 1)..].Trim();
         
-        switch (flag) {
-            case "switch":
-                if (!compiledFiles.Contains(paramater))
-                {
-                    fileQueue.Enqueue(paramater);
-                    compiledFiles.Add(paramater);
-                }
-                break;
-            case "choice":
-                if (state == State.SettingLineData)
-                {
-                    choiceId ++;
-                    scene[branchId][lineId].Choices[choiceId] = new DialogueLine();
-                    state = State.SettingChoiceText;
-                }
-                break;
+        
+        if (flag == "switch" && !compiledFiles.Contains(paramater))
+        {
+            fileQueue.Enqueue(paramater);
+            compiledFiles.Add(paramater);
+        } else if (flag == "choice" && state == State.SettingLineData) {
+            state = State.SettingChoice;
+        } else if (int.TryParse(flag, out int value))
+        {
+            choiceId ++;
+            scene[branchId][lineId].Choices[choiceId] = new DialogueElement();
+            state = State.SettingChoiceText;
         }
 
         if (state == State.SettingLineData)
+        {
             scene[branchId][lineId].VNCoreData[flag] = paramater;
+            Console.WriteLine("LineData Set");
+        }
         else if (state == State.SettingChoiceData)
+        {
             scene[branchId][lineId].Choices[choiceId].VNCoreData[flag] = paramater;
+            Console.WriteLine("ChoiceData Set");
+        }
 
     }
 }
