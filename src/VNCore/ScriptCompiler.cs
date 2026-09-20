@@ -147,10 +147,22 @@ public class ScriptCompiler
         string paramater = line[(colonIndex + 1)..].Trim();
         
         
-        if (flag == "switch" && !compiledFiles.Contains(paramater))
+        if (flag == "switch")
         {
-            fileQueue.Enqueue(paramater);
-            compiledFiles.Add(paramater);
+            if (!compiledFiles.Contains(paramater))
+            {
+                fileQueue.Enqueue(paramater);
+                compiledFiles.Add(paramater);
+            }
+
+            // Consider adding specific line in branch switching. Currently only holds branch number
+            if (state == State.SettingLineData)
+                scene[branchId][lineId].VNCoreData[flag] = compiledFiles.IndexOf(paramater).ToString();
+            else if (state == State.SettingChoiceData)
+                scene[branchId][lineId].Choices[choiceId].VNCoreData[flag] = compiledFiles.IndexOf(paramater).ToString();
+
+            return;
+
         } else if (flag == "choice" && state == State.SettingLineData) {
             state = State.SettingChoice;
         } else if (int.TryParse(flag, out int value))

@@ -7,7 +7,7 @@
         "Precondition": "x\u003E3",
         "a": "csada",
         "annie": "anger\u002B3",
-        "switch": "test-data/test1.txt"
+        "switch": "1"
       },
       "Metadata": {},
       "Choices": {
@@ -46,7 +46,9 @@
     "1": {
       "Speaker": "Bill",
       "Text": "Me too",
-      "VNCoreData": {},
+      "VNCoreData": {
+        "switch": "0"
+      },
       "Metadata": {},
       "Choices": {}
     }

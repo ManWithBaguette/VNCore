@@ -3,3 +3,4 @@ John:
 
 Bill:
 "Me too"
+switch: test-data/test.txt
