@@ -2,13 +2,13 @@ namespace VNCore;
 
 public class Engine
 {
-    public GameState State { get; }
-    public DialogueManager Dialogue { get; }
+    // public GameState State { get; }
+    // public DialogueManager Dialogue { get; }
 
     public Engine()
     {
-        State = new GameState();
-        Dialogue = new DialogueManager();
+        // State = new GameState();
+        // Dialogue = new DialogueManager();
     }
 
     public void Start()
