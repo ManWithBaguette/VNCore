@@ -144,22 +144,52 @@ public class ScriptCompiler
 
         int colonIndex = line.IndexOf(':');
         string flag = line[..colonIndex].Trim();
-        string paramater = line[(colonIndex + 1)..].Trim();
+        string parameter = line[(colonIndex + 1)..].Trim();
         
         
         if (flag == "switch")
         {
-            if (!compiledFiles.Contains(paramater))
-            {
-                fileQueue.Enqueue(paramater);
-                compiledFiles.Add(paramater);
-            }
 
-            // Consider adding specific line in branch switching. Currently only holds branch number
+            string switchTarget;
+
+            if (int.TryParse(parameter, out int value))
+            {
+                switchTarget = value.ToString();
+            }
+            else if (parameter.Contains(':'))
+            {
+                Dictionary<string, string> switchParameters = new();
+                string[] parts = parameter.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (string part in parts)
+                {
+                    string[] keyValue = part.Split(':', 2);
+                    switchParameters[keyValue[0]] = keyValue[1];
+                }
+
+                if (switchParameters.TryGetValue("path", out string? target))
+                {
+                    if (!compiledFiles.Contains(target))
+                    {
+                        fileQueue.Enqueue(target);
+                        compiledFiles.Add(target);
+                    }
+                    switchTarget = compiledFiles.IndexOf(target).ToString();
+                } else
+                    switchTarget = branchId.ToString();
+
+                if (switchParameters.TryGetValue("line", out string? lineValue))
+                {
+                    switchTarget = $"{switchTarget}:{lineValue}";
+                }
+            }
+            else
+                switchTarget = parameter;
+
             if (state == State.SettingLineData)
-                scene[branchId][lineId].VNCoreData[flag] = compiledFiles.IndexOf(paramater).ToString();
+                scene[branchId][lineId].VNCoreData[flag] = switchTarget;
             else if (state == State.SettingChoiceData)
-                scene[branchId][lineId].Choices[choiceId].VNCoreData[flag] = compiledFiles.IndexOf(paramater).ToString();
+                scene[branchId][lineId].Choices[choiceId].VNCoreData[flag] = switchTarget;
 
             return;
 
@@ -174,12 +204,12 @@ public class ScriptCompiler
 
         if (state == State.SettingLineData)
         {
-            scene[branchId][lineId].VNCoreData[flag] = paramater;
+            scene[branchId][lineId].VNCoreData[flag] = parameter;
             Console.WriteLine("LineData Set");
         }
         else if (state == State.SettingChoiceData)
         {
-            scene[branchId][lineId].Choices[choiceId].VNCoreData[flag] = paramater;
+            scene[branchId][lineId].Choices[choiceId].VNCoreData[flag] = parameter;
             Console.WriteLine("ChoiceData Set");
         }
 
