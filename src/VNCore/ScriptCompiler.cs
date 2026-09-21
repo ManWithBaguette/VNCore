@@ -184,7 +184,7 @@ public class ScriptCompiler
                 }
             }
             else
-                switchTarget = parameter;
+                switchTarget = compiledFiles.IndexOf(parameter).ToString();
 
             if (state == State.SettingLineData)
                 scene[branchId][lineId].VNCoreData[flag] = switchTarget;
