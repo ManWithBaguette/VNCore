@@ -5,35 +5,39 @@ namespace VNCore.DialogueManager;
 
 public class DialogueManager
 {
-    private Dictionary<int, Dictionary<int, DialogueLine>> script = new();
+    private Dictionary<int, Dictionary<int, DialogueLine>> scene = new();
     private DialogueLine currentLine;
     private int currentBranch = 1;
     private int currentLineNum = 0;
+
+    private List<DialogueLine> dialogueTree = new();
     
 
     public void readScript(string path)
     {
         string jsonContent = File.ReadAllText(path);
-        script = JsonSerializer.Deserialize<Dictionary<int, Dictionary<int, DialogueLine>>>(jsonContent);
-        int i = 1;
-        int j = 0;
-        int k = 0;
-        while (true)
+        scene = JsonSerializer.Deserialize<Dictionary<int, Dictionary<int, DialogueLine>>>(jsonContent);
+        // dialogueTree.Add(currentLine);
+        while (scene[currentBranch].ContainsKey(currentLineNum))
         {
-
-            Console.WriteLine($"{script[i][j].Speaker}");
-            j++;
+            currentLine = scene[currentBranch][currentLineNum];
+            dialogueTree.Add(currentLine);
+            Console.WriteLine($"{scene[currentBranch][currentLineNum].Speaker}");
             nextLine();
+            currentLineNum++;
         }
     }
 
     public void nextLine()
     {
-        var x = script[currentBranch][0].VNCoreData;
-        Console.WriteLine(x.ContainsKey("switch"));
-        if (script[currentBranch][0].VNCoreData.ContainsKey("switch"))
+        if (currentLine.VNCoreData.ContainsKey("switch"))
         {
+            int[] switchDestination = currentLine.VNCoreData["switch"].Split(':').Select(int.Parse).ToArray();
             Console.WriteLine("This Line contains switch");
+        }
+        else
+        {
+            Console.WriteLine("No switch");
         }
     }
 }
