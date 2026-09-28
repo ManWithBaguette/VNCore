@@ -1,8 +1,8 @@
 ﻿using VNCore.Compiler; using VNCore.DialogueManager;
 
-var compiler = new ScriptCompiler();
+// var compiler = new ScriptCompiler();
 
-compiler.Compile("test-data/test.txt");
+// compiler.Compile("test-data/test.txt");
 
 Console.WriteLine("Compilation complete!");
 

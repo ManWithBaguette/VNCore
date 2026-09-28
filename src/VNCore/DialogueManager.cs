@@ -6,8 +6,10 @@ namespace VNCore.DialogueManager;
 public class DialogueManager
 {
     private Dictionary<int, Dictionary<int, DialogueLine>> script = new();
-    private int currentBranch;
-    private int currentLine;
+    private DialogueLine currentLine;
+    private int currentBranch = 1;
+    private int currentLineNum = 0;
+    
 
     public void readScript(string path)
     {
@@ -21,6 +23,17 @@ public class DialogueManager
 
             Console.WriteLine($"{script[i][j].Speaker}");
             j++;
+            nextLine();
+        }
+    }
+
+    public void nextLine()
+    {
+        var x = script[currentBranch][0].VNCoreData;
+        Console.WriteLine(x.ContainsKey("switch"));
+        if (script[currentBranch][0].VNCoreData.ContainsKey("switch"))
+        {
+            Console.WriteLine("This Line contains switch");
         }
     }
 }
