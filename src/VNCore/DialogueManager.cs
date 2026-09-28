@@ -24,7 +24,6 @@ public class DialogueManager
             dialogueTree.Add(currentLine);
             Console.WriteLine($"{scene[currentBranch][currentLineNum].Speaker}");
             nextLine();
-            currentLineNum++;
         }
     }
 
@@ -34,10 +33,22 @@ public class DialogueManager
         {
             int[] switchDestination = currentLine.VNCoreData["switch"].Split(':').Select(int.Parse).ToArray();
             Console.WriteLine("This Line contains switch");
+            switch (switchDestination.Length)
+            {
+                case 1:
+                    currentLineNum = switchDestination[0];
+                    break;
+                case 2:
+                    currentBranch = switchDestination[0];
+                    currentLineNum = switchDestination[1];
+                    break;
+
+            }
         }
         else
         {
             Console.WriteLine("No switch");
+            currentLineNum++;
         }
     }
 }
