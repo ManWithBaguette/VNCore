@@ -154,7 +154,7 @@ public class ScriptCompiler
 
             if (int.TryParse(parameter, out int value))
             {
-                switchTarget = value.ToString();
+                switchTarget = $"0:{value}";
             }
             else if (parameter.Contains(':'))
             {
@@ -184,7 +184,7 @@ public class ScriptCompiler
                 }
             }
             else
-                switchTarget = compiledFiles.IndexOf(parameter).ToString();
+                switchTarget = $"{compiledFiles.IndexOf(parameter)}:0";
 
             if (state == State.SettingLineData)
                 scene[branchId][lineId].VNCoreData[flag] = switchTarget;

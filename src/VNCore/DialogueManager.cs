@@ -12,6 +12,18 @@ public class DialogueManager
 
     private List<DialogueLine> dialogueTree = new();
     
+    
+    public void LoadScene(string path)
+    {
+        string jsonContent = File.ReadAllText(path);
+        scene = JsonSerializer.Deserialize<Dictionary<int, Dictionary<int, DialogueLine>>>(jsonContent);
+    }
+    public DialogueLine GetCurrentLine()
+    {
+        return currentLine;
+    }
+
+
 
     public void readScript(string path)
     {
@@ -23,27 +35,18 @@ public class DialogueManager
             currentLine = scene[currentBranch][currentLineNum];
             dialogueTree.Add(currentLine);
             Console.WriteLine($"{scene[currentBranch][currentLineNum].Speaker}");
-            nextLine();
+            Advance();
         }
     }
 
-    public void nextLine()
+    public void Advance()
     {
         if (currentLine.VNCoreData.ContainsKey("switch"))
         {
             int[] switchDestination = currentLine.VNCoreData["switch"].Split(':').Select(int.Parse).ToArray();
             Console.WriteLine("This Line contains switch");
-            switch (switchDestination.Length)
-            {
-                case 1:
-                    currentLineNum = switchDestination[0];
-                    break;
-                case 2:
-                    currentBranch = switchDestination[0];
-                    currentLineNum = switchDestination[1];
-                    break;
-
-            }
+            currentBranch = switchDestination[0];
+            currentLineNum = switchDestination[1];
         }
         else
         {
