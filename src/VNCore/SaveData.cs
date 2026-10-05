@@ -6,7 +6,7 @@ public class SaveData
 
     public void Update(Dictionary<string, string> newValues)
     {
-        
+        Console.WriteLine("Data updated");
     }
 
 
