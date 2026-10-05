@@ -5,14 +5,19 @@ namespace VNCore.DialogueManager;
 
 public class DialogueManager
 {
+    private SaveData saveData;
     private Dictionary<int, Dictionary<int, DialogueLine>> scene = new();
-    private DialogueLine currentLine;
+    private DialogueLine currentLine = new();
     private int currentBranch = 1;
     private int currentLineNum = 0;
 
     private List<DialogueLine> dialogueTree = new();
     
-    
+    public DialogueManager(SaveData saveData)
+    {
+        this.saveData = saveData;
+    }
+
     public void LoadScene(string path)
     {
         string jsonContent = File.ReadAllText(path);
@@ -23,6 +28,10 @@ public class DialogueManager
         return currentLine;
     }
 
+    public void SelectChoice(int num)
+    {
+
+    }
 
 
     public void readScript(string path)
