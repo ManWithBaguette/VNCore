@@ -30,7 +30,11 @@ public class DialogueManager
 
     public void SelectChoice(int num)
     {
-
+        DialogueElement choice = currentLine.Choices[num];
+        if (choice.VNCoreData.TryGetValue("switch", out string? destination))
+        {
+            Switch(destination);
+        }
     }
 
 
@@ -50,17 +54,46 @@ public class DialogueManager
 
     public void Advance()
     {
-        if (currentLine.VNCoreData.ContainsKey("switch"))
+        if (currentLine.Choices.Count > 0)
         {
-            int[] switchDestination = currentLine.VNCoreData["switch"].Split(':').Select(int.Parse).ToArray();
-            Console.WriteLine("This Line contains switch");
-            currentBranch = switchDestination[0];
-            currentLineNum = switchDestination[1];
+            int select;
+            while (true)
+            {
+                Console.WriteLine("Select a Choice");
+                if (int.TryParse(Console.ReadLine(), out int result))
+                {
+                    if (currentLine.Choices.ContainsKey(result))
+                    {
+                        select = result;
+                        break;
+                    } else
+                    {
+                        Console.WriteLine("Choice invalid, enter again.");
+                    }
+                }
+            }
+            
+            SelectChoice(select);
+        }
+        if (currentLine.VNCoreData.TryGetValue("switch", out string? destination))
+        {
+            Switch(destination);
         }
         else
         {
             Console.WriteLine("No switch");
             currentLineNum++;
         }
+        saveData.Update(currentLine.Metadata);
+    }
+
+    public void Switch(string destination)
+    {
+        Console.WriteLine($"Destination: {destination}");
+        int[] switchDestination = destination.Split(':').Select(int.Parse).ToArray();
+        Console.WriteLine("This Line contains switch");
+        Console.WriteLine($"Branch: {switchDestination[0]}, Line: {switchDestination[1]}");
+        currentBranch = switchDestination[0];
+        currentLineNum = switchDestination[1];
     }
 }
