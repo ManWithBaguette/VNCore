@@ -7,14 +7,15 @@
         "Precondition": "x\u003E3",
         "a": "csada",
         "annie": "anger\u002B3",
-        "switch": "13"
+        "switch": "2:0"
       },
       "Metadata": {},
       "Choices": {
         "1": {
           "Text": "abcdefghijk",
           "VNCoreData": {
-            "Precondition": "x\u003C4"
+            "Precondition": "x\u003C4",
+            "switch": "2:0"
           },
           "Metadata": {}
         },
@@ -47,7 +48,7 @@
       "Speaker": "Bill",
       "Text": "Me too",
       "VNCoreData": {
-        "switch": "test-data/test.txt"
+        "switch": "1:0"
       },
       "Metadata": {},
       "Choices": {}
