@@ -14,7 +14,8 @@
         "1": {
           "Text": "abcdefghijk",
           "VNCoreData": {
-            "Precondition": "x\u003C4"
+            "Precondition": "x\u003C4",
+            "switch": "2:0"
           },
           "Metadata": {}
         },

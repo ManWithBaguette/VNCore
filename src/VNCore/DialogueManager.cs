@@ -1,7 +1,14 @@
+using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using VNCore.Dialogue;
 
 namespace VNCore.DialogueManager;
+
+public enum State
+{
+    DIALOGUE,
+    CHOICE,
+}
 
 public class DialogueManager
 {
@@ -10,6 +17,8 @@ public class DialogueManager
     private DialogueLine currentLine = new();
     private int currentBranch = 1;
     private int currentLineNum = 0;
+
+    private State dialogueState;
 
     public Dictionary<int, DialogueElement> choices = new();
 
@@ -26,6 +35,10 @@ public class DialogueManager
         scene = JsonSerializer.Deserialize<Dictionary<int, Dictionary<int, DialogueLine>>>(jsonContent);
         currentLine = scene[1][0];
         choices = currentLine.Choices;
+        if (choices.Count() > 0)
+        {
+            dialogueState = State.CHOICE;
+        }
     }
     public DialogueLine GetCurrentLine()
     {
@@ -43,7 +56,10 @@ public class DialogueManager
             Switch(destination);
         } else
         {
-            Advance();
+            Console.WriteLine("Choice with no switch selected.");
+            dialogueState = State.DIALOGUE;
+            currentLineNum++;
+            // Advance();
         }
     }
 
@@ -84,15 +100,31 @@ public class DialogueManager
                 Advance();
             }
         }
+        Console.WriteLine("End of branch reached.");
     }
 
     public void Advance()
     {
 
+        choices = currentLine.Choices;
+        Console.WriteLine("Choices updated");
+
+        if (choices.Count > 0)
+        {
+            dialogueState = State.CHOICE;
+        } else
+        {
+            dialogueState  = State.DIALOGUE;
+        }
+
+        if (dialogueState == State.CHOICE)
+        {
+            Console.WriteLine("Currently in choice selection.");
+            return;
+        }
+
         saveData.Update(currentLine.Metadata);
 
-        choices = currentLine.Choices; 
-        Console.WriteLine("Choices updated");
 
         if (currentLine.VNCoreData.TryGetValue("switch", out string? destination))
         {
@@ -114,5 +146,7 @@ public class DialogueManager
         Console.WriteLine($"Branch: {switchDestination[0]}, Line: {switchDestination[1]}");
         currentBranch = switchDestination[0];
         currentLineNum = switchDestination[1];
+        currentLine = scene[currentBranch][currentLineNum];
+        choices = currentLine.Choices;
     }
 }
