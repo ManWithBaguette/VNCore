@@ -8,6 +8,7 @@ public enum State
 {
     DIALOGUE,
     CHOICE,
+    END
 }
 
 public class DialogueManager
@@ -18,7 +19,7 @@ public class DialogueManager
     private int currentBranch = 1;
     private int currentLineNum = 0;
 
-    private State dialogueState;
+    public State dialogueState;
 
     public Dictionary<int, DialogueElement> choices = new();
 
@@ -47,6 +48,11 @@ public class DialogueManager
 
     public void SelectChoice(int num) // Assume choice selection in range.
     {
+        if (! choices.ContainsKey(num))
+        {
+            Console.WriteLine("Invalid Choice Selection");
+            return;
+        }
         DialogueElement choice = choices[num];
 
         saveData.Update(choice.Metadata);
@@ -59,48 +65,9 @@ public class DialogueManager
             Console.WriteLine("Choice with no switch selected.");
             dialogueState = State.DIALOGUE;
             currentLineNum++;
+            currentLine = scene[currentBranch][currentLineNum];
             // Advance();
         }
-    }
-
-
-    public void readScript(string path) // Testing function. The contents of this function should be essentially made on the user side after completion.
-    {
-        LoadScene(path);
-        // dialogueTree.Add(currentLine);
-        while (scene[currentBranch].ContainsKey(currentLineNum))
-        {
-            currentLine = scene[currentBranch][currentLineNum];
-            dialogueTree.Add(currentLine);
-            Console.WriteLine($"{scene[currentBranch][currentLineNum].Speaker}");
-
-            if (currentLine.Choices.Count > 0) 
-            {
-                int select;
-                while (true)
-                {
-                    Console.WriteLine("Select a Choice");
-                    if (int.TryParse(Console.ReadLine(), out int result))
-                    {
-                        if (currentLine.Choices.ContainsKey(result))
-                        {
-                            select = result;
-                            break;
-                        } else
-                        {
-                            Console.WriteLine("Choice invalid, enter again.");
-                        }
-                    }
-                }
-                
-                SelectChoice(select);
-            } else
-            {
-                Console.ReadLine();
-                Advance();
-            }
-        }
-        Console.WriteLine("End of branch reached.");
     }
 
     public void Advance()
@@ -134,6 +101,7 @@ public class DialogueManager
         {
             Console.WriteLine("No switch");
             currentLineNum++;
+            currentLine = scene[currentBranch][currentLineNum];
         }
         
     }
