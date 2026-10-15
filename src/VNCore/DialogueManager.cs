@@ -65,7 +65,7 @@ public class DialogueManager
             Console.WriteLine("Choice with no switch selected.");
             dialogueState = State.DIALOGUE;
             currentLineNum++;
-            currentLine = scene[currentBranch][currentLineNum];
+            UpdateLine();
             // Advance();
         }
     }
@@ -101,7 +101,7 @@ public class DialogueManager
         {
             Console.WriteLine("No switch");
             currentLineNum++;
-            currentLine = scene[currentBranch][currentLineNum];
+            UpdateLine();
         }
         
     }
@@ -114,6 +114,23 @@ public class DialogueManager
         Console.WriteLine($"Branch: {switchDestination[0]}, Line: {switchDestination[1]}");
         currentBranch = switchDestination[0];
         currentLineNum = switchDestination[1];
+        UpdateLine();
+        choices = currentLine.Choices;
+    }
+
+    private void UpdateLine()
+    {
+        if (!scene.ContainsKey(currentBranch))
+        {
+            Console.WriteLine("Branch change invalid");
+            return;
+        }
+        if (!scene[currentBranch].ContainsKey(currentLineNum))
+        {
+            Console.WriteLine("End of Branch reached.");
+            dialogueState = State.END;
+            return;
+        }
         currentLine = scene[currentBranch][currentLineNum];
         choices = currentLine.Choices;
     }
