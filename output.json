@@ -24,14 +24,18 @@
           "VNCoreData": {
             "Condition": "2"
           },
-          "Metadata": {}
+          "Metadata": {
+            "anger": "+3"
+          }
         }
       }
     },
     "1": {
       "Speaker": "ASDAS",
       "Text": "ASDASDSA",
-      "VNCoreData": {},
+      "VNCoreData": {
+        "switch": "1:0"
+      },
       "Metadata": {},
       "Choices": {}
     }
