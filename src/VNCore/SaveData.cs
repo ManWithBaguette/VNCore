@@ -1,11 +1,12 @@
 using System.Text.RegularExpressions;
 using System.Globalization;
+using System.Text.Json;
 
 namespace VNCore;
 
 public class SaveData
 {
-    Dictionary<string, string> data = new();
+    public Dictionary<string, string> Data { get; set; } = new();
 
     public void Update(Dictionary<string, string> newValues)
     {
@@ -14,24 +15,24 @@ public class SaveData
             Update(item.Key, item.Value);
         }
         Console.WriteLine("Data updated");
-        if (data.ContainsKey("anger"))
+        if (Data.ContainsKey("anger"))
         {
-            Console.WriteLine($"New anger value: {data["anger"]}");
+            Console.WriteLine($"New anger value: {Data["anger"]}");
         }
     }
 
     public void Update(string key, string value)
         {
-        if (!data.ContainsKey(key))
+        if (!Data.ContainsKey(key))
         {
-            data[key] = "0";
+            Data[key] = "0";
             Console.WriteLine("entry added");
         }
 
         // Direct assignment only if the value isn't an operation
         if (value.Length > 0 && !"+-*/".Contains(value[0]) && double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double directValue))
         {
-            data[key] = directValue.ToString(CultureInfo.InvariantCulture);
+            Data[key] = directValue.ToString(CultureInfo.InvariantCulture);
             return;
         }
 
@@ -42,7 +43,7 @@ public class SaveData
             return;
         }
 
-        if (!double.TryParse(data[key], NumberStyles.Float, CultureInfo.InvariantCulture, out double currentValue))
+        if (!double.TryParse(Data[key], NumberStyles.Float, CultureInfo.InvariantCulture, out double currentValue))
         {
             Console.WriteLine("Dictionary value is not numeric");
             return;
@@ -63,7 +64,7 @@ public class SaveData
             _ => throw new ArgumentException($"Unknown operation: {value[0]}")
         };
         Console.WriteLine($"In update: {result}");
-        data[key] = result.ToString(CultureInfo.InvariantCulture);
+        Data[key] = result.ToString(CultureInfo.InvariantCulture);
         Console.WriteLine("Data updated");
     }
 
@@ -86,7 +87,7 @@ public class SaveData
             return number;
         }
 
-        if (data.TryGetValue(operand, out string value) &&
+        if (Data.TryGetValue(operand, out string value) &&
             double.TryParse(
                 value,
                 NumberStyles.Float,

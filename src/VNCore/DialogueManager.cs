@@ -11,9 +11,9 @@ public enum State
     END
 }
 
-public class DialogueManager
+public class DialogueManager //Note. modify so that dialogue doesnt require a save file.
 {
-    private SaveData saveData;
+    public SaveData saveData;
     private Dictionary<int, Dictionary<int, DialogueLine>> scene = new();
     private DialogueLine currentLine = new();
     private int currentBranch = 1;

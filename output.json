@@ -51,9 +51,7 @@
     "1": {
       "Speaker": "Bill",
       "Text": "Me too",
-      "VNCoreData": {
-        "switch": "1:0"
-      },
+      "VNCoreData": {},
       "Metadata": {},
       "Choices": {}
     }

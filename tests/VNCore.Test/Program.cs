@@ -8,11 +8,10 @@ using VNCore.DialogueManager;
 // compiler.Compile("test-data/test.txt");
 
 Console.WriteLine("Compilation complete!");
-SaveData save = new();
 int choice = 0;
-var dialogueManager = new DialogueManager(save);
-
-// dialogueManager.readScript("output.json");
+var saveManager = new SaveManager();
+saveManager.LoadSave("");
+var dialogueManager = new DialogueManager(saveManager.Current);
 dialogueManager.LoadScene("output.json");
 while (dialogueManager.dialogueState != State.END) //Test code. Later probably simplify use of the dialogue manager.
 {
@@ -33,3 +32,4 @@ while (dialogueManager.dialogueState != State.END) //Test code. Later probably s
         choice = value;
     }
 }
+saveManager.WriteSave();
