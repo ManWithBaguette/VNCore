@@ -9,14 +9,16 @@ a: csada
 annie: anger+3
 switch: line:3 path:test-data/test1.txt
 choice:
-    1:
-    "abcdefghijk"
-    Precondition: x<4
+    1: INLINE
+    "Choice 1 Text"
     2:
-    "ffffff"
+    "Choice 2 Text"
     Condition: 2
 
 
 
 ASDAS:
 "ASDASDSA"
+choice:
+    1: Choice 3
+    2: Choice 4

@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Text.Json;
 using VNCore.Dialogue;
 
@@ -55,17 +56,20 @@ public class ScriptCompiler
                         if (string.IsNullOrWhiteSpace(trimmed))
                             continue;
 
-                        if (trimmed.EndsWith(':'))
+                        int colonIndex = trimmed.IndexOf(':');
+
+                        if (colonIndex != -1)
                         {
                             lineId ++;
-                            lines[lineId] = new DialogueLine {Speaker = trimmed[..^1]};
+                            lines[lineId] = new DialogueLine {Speaker = trimmed[..colonIndex].Trim()};
+
+                            lineText = trimmed[(colonIndex + 1)..].Trim();
                             state = State.SettingText;
                         }
                         Console.WriteLine("Speaker Set");
                         break;
 
-                    case State.SettingText: // May need to reconsider formatting later when adding " into actual dialogue. Also modify later so can also start on the same line as speaker: i.e. Nelson: LineText
-                        // Consider making anything that comes after the speaker name text. add a seperate stop condition for ending the line text and transitioning into metadata collection
+                    case State.SettingText: 
                         SetText(trimmed);
                         break;
                     
@@ -80,6 +84,10 @@ public class ScriptCompiler
                     case State.SettingChoice:
                         choiceId ++;
                         scene[branchId][lineId].Choices[choiceId] = new DialogueElement();
+                        if (!string.IsNullOrWhiteSpace(trimmed))
+                        {
+                            lineText = trimmed.Contains(':') ? trimmed[(trimmed.IndexOf(':') + 1)..].Trim() : trimmed;
+                        }
                         state = State.SettingChoiceText;
 
                         break;
@@ -91,7 +99,19 @@ public class ScriptCompiler
                         break;
 
                 }
+
             }
+
+            if (!string.IsNullOrWhiteSpace(lineText))
+            {
+                if (state == State.SettingText) 
+                    scene[branchId][lineId].Text = lineText;
+                else if (state == State.SettingChoiceText)
+                    scene[branchId][lineId].Choices[choiceId].Text = lineText;
+
+                lineText = "";
+            }
+            
             branchId ++;
         }
         string json = JsonSerializer.Serialize(scene, JsonContext.Default.DictionaryInt32DictionaryInt32DialogueLine);
@@ -102,37 +122,63 @@ public class ScriptCompiler
 
     private void SetText(string line)
     {
-        bool startsText = line.StartsWith('"');
-        bool endsText = line.EndsWith('"');
-
-        if (startsText && line.Length > 1)
-            line = line[1..];
-
-        if (endsText && line.Length > 0)
-            line = line[..^1];
-
-        lineText += (lineText.Length > 0 ? " " : "") + line;
-
-        if (endsText)
+        if (line.Contains(':') || string.IsNullOrWhiteSpace(line))
         {
-            if (state == State.SettingText) {
+            if (state == State.SettingText)
+            {
                 scene[branchId][lineId].Text = lineText;
                 state = State.SettingLineData;
-            } else if (state == State.SettingChoiceText) {
+            }
+            if (state == State.SettingChoiceText)
+            {
                 scene[branchId][lineId].Choices[choiceId].Text = lineText;
-                Console.WriteLine($"Choice Text: {lineText}");
                 state = State.SettingChoiceData;
             }
-            
             Console.WriteLine(
                 $"Saving line {lineId}: " +
                 $"speaker='{scene[branchId][lineId].Speaker}', " +
-                $"text='{scene[branchId][lineId].Text}'"
+                $"text='{lineText}'"
             );
-
             lineText = "";
+            SetData(line);
+            return;
         }
-        Console.WriteLine("Text Set");
+        
+        lineText += line;
+        Console.WriteLine($"Text Added: {line}");
+
+
+        // bool startsText = line.StartsWith('"');
+        // bool endsText = line.EndsWith('"');
+
+        // if (startsText && line.Length > 1)
+        //     line = line[1..];
+
+        // if (endsText && line.Length > 0)
+        //     line = line[..^1];
+
+        // lineText += (lineText.Length > 0 ? " " : "") + line;
+
+        // if (endsText)
+        // {
+        //     if (state == State.SettingText) {
+        //         scene[branchId][lineId].Text = lineText;
+        //         state = State.SettingLineData;
+        //     } else if (state == State.SettingChoiceText) {
+        //         scene[branchId][lineId].Choices[choiceId].Text = lineText;
+        //         Console.WriteLine($"Choice Text: {lineText}");
+        //         state = State.SettingChoiceData;
+        //     }
+            
+        //     Console.WriteLine(
+        //         $"Saving line {lineId}: " +
+        //         $"speaker='{scene[branchId][lineId].Speaker}', " +
+        //         $"text='{scene[branchId][lineId].Text}'"
+        //     );
+
+        //     lineText = "";
+        // }
+        // Console.WriteLine("Text Set");
     }
     private void SetData(string line)
     {
@@ -191,14 +237,16 @@ public class ScriptCompiler
             else if (state == State.SettingChoiceData)
                 scene[branchId][lineId].Choices[choiceId].VNCoreData[flag] = switchTarget;
 
+            Console.WriteLine("Switch flag set");
             return;
 
         } else if (flag == "choice" && state == State.SettingLineData) {
             state = State.SettingChoice;
-        } else if (int.TryParse(flag, out int value))
+        } else if (int.TryParse(flag, out int value) && state == State.SettingChoiceData)
         {
             choiceId ++;
             scene[branchId][lineId].Choices[choiceId] = new DialogueElement();
+            lineText = parameter;
             state = State.SettingChoiceText;
         }
 
