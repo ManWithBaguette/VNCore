@@ -13,14 +13,17 @@
       },
       "Choices": {
         "1": {
-          "Text": "INLINE \u0022Choice 1 Text\u0022",
-          "VNCoreData": {},
+          "Text": "Switch to 2:0",
+          "VNCoreData": {
+            "switch": "2:0"
+          },
           "Metadata": {}
         },
         "2": {
-          "Text": "\u0022Choice 2 Text\u0022",
+          "Text": "Switch to next line: 1:1",
           "VNCoreData": {
-            "Condition": "2"
+            "Condition": "2",
+            "switch": "1:1"
           },
           "Metadata": {}
         }

@@ -49,6 +49,7 @@ public class DialogueManager //Note. modify so that dialogue doesnt require a sa
     }
 
     public void SelectChoice(int num) // Assume choice selection in range.
+    // Modify so that this only sets choice number, actual selection logic happens after calling advance() after setting a choice number
     {
         if (! choices.ContainsKey(num))
         {
