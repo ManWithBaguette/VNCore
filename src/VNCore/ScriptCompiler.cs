@@ -27,7 +27,7 @@ public class ScriptCompiler
     private int lineId;
     private int choiceId;
 
-    private List<String> coreDataFlags = [
+    private List<String> CoreDataFlags = [
         "switch",
         "condition",
         "precondition",
@@ -38,7 +38,7 @@ public class ScriptCompiler
 
     private State state;
 
-    public void Compile(string filepath)
+    public void Compile(string filepath, string outputPath)
     {
         scene = new Dictionary<int, Dictionary<int, DialogueLine>>();
         compiledFiles = new List<string>();
@@ -126,9 +126,8 @@ public class ScriptCompiler
             branchId ++;
         }
         string json = JsonSerializer.Serialize(scene, JsonContext.Default.DictionaryInt32DictionaryInt32DialogueLine);
-        string outputPath = Path.GetFullPath("output.json");
-        Console.WriteLine(outputPath);
-        File.WriteAllText("output.json", json);
+        Console.WriteLine($"{outputPath}.json");
+        File.WriteAllText($"scenes\\{outputPath}.json", json);
     }
 
     private void SetText(string line)
@@ -203,7 +202,7 @@ public class ScriptCompiler
         string flag = line[..colonIndex].Trim();
         string parameter = line[(colonIndex + 1)..].Trim();
         
-        bool isCoreData = coreDataFlags.Contains(flag.ToLower());
+        bool isCoreData = CoreDataFlags.Contains(flag.ToLower());
 
         
         if (flag == "switch")
