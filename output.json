@@ -5,11 +5,12 @@
       "Text": "11\u0022MeepMerp asdfasd aksdljf;alskd asdfasdfddd \u0022",
       "VNCoreData": {
         "Precondition": "x\u003E3",
-        "a": "csada",
-        "annie": "anger\u002B3",
         "switch": "1:3"
       },
-      "Metadata": {},
+      "Metadata": {
+        "a": "csada",
+        "annie": "anger\u002B3"
+      },
       "Choices": {
         "1": {
           "Text": "INLINE \u0022Choice 1 Text\u0022",

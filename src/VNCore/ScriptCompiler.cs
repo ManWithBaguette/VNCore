@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Drawing;
 using System.Text.Json;
 using VNCore.Dialogue;
@@ -25,6 +26,15 @@ public class ScriptCompiler
     private string lineText = "";
     private int lineId;
     private int choiceId;
+
+    private List<String> coreDataFlags = [
+        "switch",
+        "condition",
+        "precondition",
+        "postcondition",
+
+
+    ];
 
     private State state;
 
@@ -193,6 +203,8 @@ public class ScriptCompiler
         string flag = line[..colonIndex].Trim();
         string parameter = line[(colonIndex + 1)..].Trim();
         
+        bool isCoreData = coreDataFlags.Contains(flag.ToLower());
+
         
         if (flag == "switch")
         {
@@ -251,15 +263,30 @@ public class ScriptCompiler
             state = State.SettingChoiceText;
         }
 
-        if (state == State.SettingLineData)
+        if (isCoreData)
         {
-            scene[branchId][lineId].VNCoreData[flag] = parameter;
-            Console.WriteLine("LineData Set");
-        }
-        else if (state == State.SettingChoiceData)
+            if (state == State.SettingLineData)
+            {
+                scene[branchId][lineId].VNCoreData[flag] = parameter;
+                Console.WriteLine("LineData Set");
+            }
+            else if (state == State.SettingChoiceData)
+            {
+                scene[branchId][lineId].Choices[choiceId].VNCoreData[flag] = parameter;
+                Console.WriteLine("ChoiceData Set");
+            }
+        } else
         {
-            scene[branchId][lineId].Choices[choiceId].VNCoreData[flag] = parameter;
-            Console.WriteLine("ChoiceData Set");
+            if (state == State.SettingLineData)
+            {
+                scene[branchId][lineId].Metadata[flag] = parameter;
+                Console.WriteLine("LineData Set");
+            }
+            else if (state == State.SettingChoiceData)
+            {
+                scene[branchId][lineId].Choices[choiceId].Metadata[flag] = parameter;
+                Console.WriteLine("ChoiceData Set");
+            }
         }
 
     }
