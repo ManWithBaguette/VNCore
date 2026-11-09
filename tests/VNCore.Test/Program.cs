@@ -31,14 +31,12 @@ while (dialogueManager.dialogueState != State.END) //Test code. Later probably s
     {
         choice = value;
     }
-    
+
     if (choice != 0)
     {
         dialogueManager.SelectChoice(choice);
     }
-    else
-    {
-        dialogueManager.Advance();
-    }
+    dialogueManager.Advance();
+    
 }
 saveManager.WriteSave();
