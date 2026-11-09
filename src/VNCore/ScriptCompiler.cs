@@ -31,6 +31,7 @@ public class ScriptCompiler
     public void Compile(string filepath)
     {
         scene = new Dictionary<int, Dictionary<int, DialogueLine>>();
+        compiledFiles = new List<string>();
         fileQueue = new Queue<string>();
         fileQueue.Enqueue(filepath);
 
@@ -144,7 +145,7 @@ public class ScriptCompiler
             return;
         }
         
-        lineText += line;
+        lineText += (lineText.Length > 0 ? " " : "") + line;
         Console.WriteLine($"Text Added: {line}");
 
 

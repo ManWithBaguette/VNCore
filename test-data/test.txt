@@ -4,11 +4,11 @@ asdfasd
 aksdljf;alskd
 asdfasdfddd
 "
-Precondition: x>3
-a: csada
-annie: anger+3
-switch: line:3 path:test-data/test1.txt
-choice:
+    Precondition: x>3
+    a: csada
+    annie: anger+3
+    switch: line:3 path:test-data/test1.txt
+    choice:
     1: INLINE
     "Choice 1 Text"
     2:
