@@ -93,7 +93,7 @@ public class ScriptCompiler
                         break;
 
                     case State.SettingChoice:
-                        choiceId ++;
+                        choiceId = 1;
                         scene[branchId][lineId].Choices[choiceId] = new DialogueElement();
                         if (!string.IsNullOrWhiteSpace(trimmed))
                         {
