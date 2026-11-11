@@ -8,6 +8,7 @@ public enum State
 {
     DIALOGUE,
     CHOICE,
+    LAST,
     END
 }
 
@@ -23,7 +24,7 @@ public class DialogueManager //Note. modify so that dialogue doesnt require a sa
 
     public Dictionary<int, DialogueElement> choices = new();
     
-    private DialogueElement? currentChoice;
+    public DialogueElement? currentChoice;
 
     private List<DialogueLine> dialogueTree = new();
     
@@ -56,6 +57,7 @@ public class DialogueManager //Note. modify so that dialogue doesnt require a sa
         if (! choices.ContainsKey(num))
         {
             Console.WriteLine("Invalid Choice Selection");
+            currentChoice = null;
             return;
         }
         
@@ -64,7 +66,11 @@ public class DialogueManager //Note. modify so that dialogue doesnt require a sa
 
     public void Advance()
     {
-
+        if (dialogueState == State.LAST)
+        {
+            dialogueState = State.END;
+            return;
+        }
         choices = currentLine.Choices;
 
         if (choices.Count > 0)
@@ -138,7 +144,7 @@ public class DialogueManager //Note. modify so that dialogue doesnt require a sa
         if (!scene[currentBranch].ContainsKey(currentLineNum))
         {
             Console.WriteLine("End of Branch reached.");
-            dialogueState = State.END;
+            dialogueState = State.LAST;
             return;
         }
         currentLine = scene[currentBranch][currentLineNum];
