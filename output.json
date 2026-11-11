@@ -13,18 +13,18 @@
       },
       "Choices": {
         "1": {
-          "Text": "Switch to 2:0",
+          "Text": "Switch to 110",
           "VNCoreData": {
-            "switch": "2:0",
-            "precondition": "x > 6"
+            "switch": "1:1",
+            "precondition": "x == 0"
           },
           "Metadata": {}
         },
         "2": {
-          "Text": "Switch to next line: 1:1",
+          "Text": "Switch to next line: 2:0",
           "VNCoreData": {
             "Condition": "2",
-            "switch": "1:1"
+            "switch": "2:0"
           },
           "Metadata": {}
         }
@@ -33,20 +33,11 @@
     "1": {
       "Speaker": "ASDAS",
       "Text": "\u0022ASDASDSA\u0022",
-      "VNCoreData": {},
+      "VNCoreData": {
+        "precondition": "x == 10000"
+      },
       "Metadata": {},
-      "Choices": {
-        "3": {
-          "Text": "Choice 3",
-          "VNCoreData": {},
-          "Metadata": {}
-        },
-        "4": {
-          "Text": "Choice 4",
-          "VNCoreData": {},
-          "Metadata": {}
-        }
-      }
+      "Choices": {}
     }
   },
   "2": {
@@ -63,7 +54,9 @@
       "VNCoreData": {
         "switch": "1:0"
       },
-      "Metadata": {},
+      "Metadata": {
+        "x": "+2"
+      },
       "Choices": {}
     }
   }

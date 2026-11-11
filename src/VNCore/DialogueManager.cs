@@ -12,7 +12,7 @@ public enum State
     END
 }
 
-public class DialogueManager //Note. modify so that dialogue doesnt require a save file.
+public class DialogueManager
 {
     public SaveData? saveData;
     private Dictionary<int, Dictionary<int, DialogueLine>> scene = new();
@@ -27,6 +27,8 @@ public class DialogueManager //Note. modify so that dialogue doesnt require a sa
     public DialogueElement? currentChoice;
 
     private List<DialogueLine> dialogueTree = new();
+
+    private bool skippingLine = false;
     
     public DialogueManager() {}
 
@@ -51,8 +53,7 @@ public class DialogueManager //Note. modify so that dialogue doesnt require a sa
         return currentLine;
     }
 
-    public void SelectChoice(int num) // Assume choice selection in range.
-    // Modify so that this only sets choice number, actual selection logic happens after calling advance() after setting a choice number
+    public void SelectChoice(int num) // Assume choice selection in range. <- modify to protect against this actually
     {
         if (! choices.ContainsKey(num))
         {
@@ -117,6 +118,7 @@ public class DialogueManager //Note. modify so that dialogue doesnt require a sa
                 Console.WriteLine("No switch");
             }
         }
+        
         currentLineNum++;
         UpdateLine();
         
@@ -148,6 +150,15 @@ public class DialogueManager //Note. modify so that dialogue doesnt require a sa
             return;
         }
         currentLine = scene[currentBranch][currentLineNum];
+        if (saveData != null && currentLine.VNCoreData.TryGetValue("precondition", out var condition))
+        {
+            if (!saveData.Compare(condition))
+            {
+                currentLineNum++;
+                UpdateLine();
+                return;
+            }
+        }
         UpdateChoices();
     }
 

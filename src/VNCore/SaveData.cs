@@ -19,6 +19,10 @@ public class SaveData
         {
             Console.WriteLine($"New anger value: {Data["anger"]}");
         }
+        if (Data.ContainsKey("x"))
+        {
+            Console.WriteLine($"New x value: {Data["x"]}");
+        }
     }
 
     public void Update(string key, string value)
