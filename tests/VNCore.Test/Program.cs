@@ -11,8 +11,8 @@ Console.WriteLine("Compilation complete!");
 int choice = 0;
 var saveManager = new SaveManager();
 saveManager.LoadSave("");
-// var dialogueManager = new DialogueManager(saveManager.Current);
-var dialogueManager = new DialogueManager();
+var dialogueManager = new DialogueManager(saveManager.Current);
+// var dialogueManager = new DialogueManager();
 dialogueManager.LoadScene("output.json");
 while (dialogueManager.dialogueState != State.END) //Test code. Later probably simplify use of the dialogue manager.
 {
@@ -22,9 +22,9 @@ while (dialogueManager.dialogueState != State.END) //Test code. Later probably s
         DialogueLine line = dialogueManager.GetCurrentLine();
         
         Console.WriteLine($"Speaker: {line.Speaker}\nLine: {line.Text}\n");
-        if (line.Choices.Count > 0)
+        if (dialogueManager.choices.Count > 0)
         {
-            foreach (var element in line.Choices)
+            foreach (var element in dialogueManager.choices)
             {
                 Console.WriteLine($"Choice {element.Key} Text: {element.Value.Text}");
             }

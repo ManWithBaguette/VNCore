@@ -40,7 +40,7 @@ public class DialogueManager //Note. modify so that dialogue doesnt require a sa
         string jsonContent = File.ReadAllText(path);
         scene = JsonSerializer.Deserialize<Dictionary<int, Dictionary<int, DialogueLine>>>(jsonContent);
         currentLine = scene[1][0];
-        choices = currentLine.Choices;
+        UpdateChoices();
         if (choices.Count() > 0)
         {
             dialogueState = State.CHOICE;
@@ -60,8 +60,8 @@ public class DialogueManager //Note. modify so that dialogue doesnt require a sa
             currentChoice = null;
             return;
         }
-        
         currentChoice = choices[num];
+        choices = new();
     }
 
     public void Advance()
@@ -71,7 +71,7 @@ public class DialogueManager //Note. modify so that dialogue doesnt require a sa
             dialogueState = State.END;
             return;
         }
-        choices = currentLine.Choices;
+        UpdateChoices();
 
         if (choices.Count > 0)
         {
@@ -131,7 +131,7 @@ public class DialogueManager //Note. modify so that dialogue doesnt require a sa
         currentBranch = switchDestination[0];
         currentLineNum = switchDestination[1];
         UpdateLine();
-        choices = currentLine.Choices;
+        UpdateChoices();
     }
 
     private void UpdateLine()
@@ -148,6 +148,37 @@ public class DialogueManager //Note. modify so that dialogue doesnt require a sa
             return;
         }
         currentLine = scene[currentBranch][currentLineNum];
-        choices = currentLine.Choices;
+        UpdateChoices();
+    }
+
+    private void UpdateChoices()
+    {
+        choices = new();
+        if (currentLine.Choices.Count > 0 )
+        {
+            var choiceList = currentLine.Choices;
+            int choiceNum = 0;
+            foreach (var choice in choiceList)
+            {
+                if (saveData != null)
+                {
+                    if (choice.Value.VNCoreData.TryGetValue("precondition", out string? parameter))
+                    {
+                        Console.WriteLine("Precondition Detected");
+                        if (saveData.Compare(parameter))
+                        {
+                            Console.WriteLine("Comparison Passed");
+                            choiceNum ++;
+                            choices[choiceNum] = choice.Value;
+                        }
+                    } else
+                    {
+                        choiceNum ++;
+                        choices[choiceNum] = choice.Value;
+                    }
+                }
+            }
+        }
+        
     }
 }

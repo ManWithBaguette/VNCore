@@ -15,7 +15,8 @@
         "1": {
           "Text": "Switch to 2:0",
           "VNCoreData": {
-            "switch": "2:0"
+            "switch": "2:0",
+            "precondition": "x > 6"
           },
           "Metadata": {}
         },
