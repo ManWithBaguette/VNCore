@@ -14,7 +14,8 @@ public enum State
 public enum DialogueError
 {
     None,
-    FileNotFound
+    FileNotFound,
+    InvalidScene,
 }
 
 public class DialogueManager
@@ -55,8 +56,38 @@ public class DialogueManager
         {
             return new DialogueResult(false, "Scene path is empty", DialogueError.FileNotFound);
         }
-        string jsonContent = File.ReadAllText(path);
-        scene = JsonSerializer.Deserialize<Dictionary<int, Dictionary<int, DialogueLine>>>(jsonContent);
+
+        Dictionary<int, Dictionary<int, DialogueLine>>? loadedScene;
+
+        try
+        {
+            string jsonContent = File.ReadAllText(path);
+            loadedScene = JsonSerializer.Deserialize<Dictionary<int, Dictionary<int, DialogueLine>>>(jsonContent);
+        }
+        catch (IOException ex)
+        {
+            return new DialogueResult(false, $"File error: {ex.Message}");
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return new DialogueResult(false, $"Access error: {ex.Message}");
+        }
+        catch (JsonException ex)
+        {
+            return new DialogueResult(false, $"Invalid JSON: {ex.Message}");
+        }
+        
+        if (loadedScene == null)
+        {
+            return new DialogueResult(false, "Scene data is empty", DialogueError.InvalidScene);
+        }
+
+        if (!loadedScene.TryGetValue(1, out var firstBranch) || firstBranch == null || !firstBranch.ContainsKey(0))
+        {
+            return new DialogueResult(false, "Scene must contain branch 1 line 0", DialogueError.InvalidScene);
+        }
+
+        scene = loadedScene;
         
         currentBranch = 1;
         currentLineNum = 0;
