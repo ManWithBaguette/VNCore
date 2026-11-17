@@ -67,62 +67,106 @@ public class DialogueManager
 
     public void Advance()
     {
-        if (dialogueState == State.LAST)
+        switch (dialogueState)
         {
-            dialogueState = State.END;
-            return;
+            case State.DIALOGUE:
+                AdvanceDialogue();
+                break;
+            case State.CHOICE:
+                AdvanceChoice();
+                break;
+            case State.LAST:
+                EndDialogue();
+                break;
+            case State.END:
+                break;
         }
-        UpdateChoices();
+    }
 
-        if (choices.Count > 0)
+    public void AdvanceDialogue()
+    {
+        if (saveData != null)
         {
-            dialogueState = State.CHOICE;
+            saveData.Update(currentLine.Metadata);
+        }
+        if (currentLine.VNCoreData.TryGetValue("switch", out string? destination))
+        {
+            Switch(destination);
+            return;
         } else
         {
-            dialogueState  = State.DIALOGUE;
+            Console.WriteLine("No switch");
         }
+    }
 
-        if (dialogueState == State.CHOICE)
-        {
-            Console.WriteLine("Currently in choice selection.");
-
-            if (currentChoice != null)
-            {
-                if (saveData != null)
-                    saveData.Update(currentChoice.Metadata);
-
-                if (currentChoice.VNCoreData.TryGetValue("switch", out string? target))
-                {
-                    currentChoice = null;
-                    Switch(target);
-                    return;
-                } else
-                {
-                    Console.WriteLine("Choice with no switch selected.");
-                    currentChoice = null;
-                    dialogueState = State.DIALOGUE;
-                }
-            }
-        } else if (dialogueState == State.DIALOGUE)
-        {
-            if (saveData != null)
-                saveData.Update(currentLine.Metadata);
-
-
-            if (currentLine.VNCoreData.TryGetValue("switch", out string? destination))
-            {
-                Switch(destination);
-                return;
-            } else
-            {
-                Console.WriteLine("No switch");
-            }
-        }
-        
-        currentLineNum++;
-        UpdateLine();
+    public void AdvanceChoice()
+    {
         
     }
+
+    public void EndDialogue()
+    {
+        
+    }
+
+    // public void Advance()
+    // {
+    //     if (dialogueState == State.LAST)
+    //     {
+    //         dialogueState = State.END;
+    //         return;
+    //     }
+    //     UpdateChoices();
+
+    //     if (choices.Count > 0)
+    //     {
+    //         dialogueState = State.CHOICE;
+    //     } else
+    //     {
+    //         dialogueState  = State.DIALOGUE;
+    //     }
+
+    //     if (dialogueState == State.CHOICE)
+    //     {
+    //         Console.WriteLine("Currently in choice selection.");
+
+    //         if (currentChoice != null)
+    //         {
+    //             if (saveData != null)
+    //                 saveData.Update(currentChoice.Metadata);
+
+    //             if (currentChoice.VNCoreData.TryGetValue("switch", out string? target))
+    //             {
+    //                 currentChoice = null;
+    //                 Switch(target);
+    //                 return;
+    //             } else
+    //             {
+    //                 Console.WriteLine("Choice with no switch selected.");
+    //                 currentChoice = null;
+    //                 dialogueState = State.DIALOGUE;
+    //             }
+    //         }
+    //     } else if (dialogueState == State.DIALOGUE)
+    //     {
+    //         if (saveData != null)
+    //             saveData.Update(currentLine.Metadata);
+
+
+    //         if (currentLine.VNCoreData.TryGetValue("switch", out string? destination))
+    //         {
+    //             Switch(destination);
+    //             return;
+    //         } else
+    //         {
+    //             Console.WriteLine("No switch");
+    //         }
+    //     }
+        
+    //     currentLineNum++;
+    //     UpdateLine();
+        
+    // }
 
     public void Switch(string destination)
     {
