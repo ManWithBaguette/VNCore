@@ -136,13 +136,13 @@ public class DialogueManager
         }
     }
 
-    private void MoveToNextLine()
+    private DialogueResult MoveToNextLine()
     {
         currentLineNum++;
-        UpdateLine();
+        return UpdateLine();
     }
 
-    private void AdvanceDialogue()
+    private DialogueResult AdvanceDialogue()
     {
         if (saveData != null)
         {
@@ -151,18 +151,17 @@ public class DialogueManager
 
         if (currentLine.VNCoreData.TryGetValue("switch", out string? destination))
         {
-            Switch(destination);
-            return;
+            return Switch(destination);
         }
 
-        MoveToNextLine();
+        return MoveToNextLine();
     }
 
-    private void AdvanceChoice()
+    private DialogueResult AdvanceChoice()
     {
         if (currentChoice == null)
         {
-            return;
+            return new DialogueResult(false, "Cannot advance: no choice has been selected");
         }
 
         DialogueElement selectedChoice = currentChoice;
@@ -175,10 +174,9 @@ public class DialogueManager
         if (selectedChoice.VNCoreData.TryGetValue("switch", out string? destination))
         {
             Console.WriteLine("Switch on Choice");
-            Switch(destination);
-            return;
+            return Switch(destination);
         }
-        MoveToNextLine();
+        return MoveToNextLine();
     }
 
     private void EndDialogue()
