@@ -99,20 +99,21 @@ public class DialogueManager
         return new DialogueResult(true);
     }
 
-    public void SelectChoice(int num)
+    public DialogueResult SelectChoice(int num)
     {
         if (DialogueState != State.CHOICE)
         {
-            return;
+            return new DialogueResult(false, "Cannot select choice outside CHOICE state");
         }
 
-        if (!choices.ContainsKey(num))
+        if (!choices.TryGetValue(num, out var choice))
         {
             Console.WriteLine("Invalid Choice Selection");
             currentChoice = null;
-            return;
+            return new DialogueResult(false, "Choice {num} is unavailable");
         }
-        currentChoice = choices[num];
+        currentChoice = choice;
+        return new DialogueResult(true);
     }
 
     public void Advance()
