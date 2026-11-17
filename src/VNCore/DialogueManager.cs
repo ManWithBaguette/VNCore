@@ -16,6 +16,7 @@ public enum DialogueError
     None,
     FileNotFound,
     InvalidScene,
+    InvalidDestination,
 }
 
 public class DialogueManager
@@ -88,7 +89,7 @@ public class DialogueManager
         }
 
         scene = loadedScene;
-        
+
         currentBranch = 1;
         currentLineNum = 0;
         currentChoice = null;
@@ -188,31 +189,50 @@ public class DialogueManager
         }
     }
 
-    private void Switch(string destination)
+    private DialogueResult Switch(string destination)
     {
-        Console.WriteLine($"Destination: {destination}");
-        int[] switchDestination = destination.Split(':').Select(int.Parse).ToArray();
-        Console.WriteLine("This Line contains switch");
-        Console.WriteLine($"Branch: {switchDestination[0]}, Line: {switchDestination[1]}");
-        currentBranch = switchDestination[0];
-        currentLineNum = switchDestination[1];
-        UpdateLine();
+        if (string.IsNullOrWhiteSpace(destination))
+        {
+            return new DialogueResult(false, "Switch destination is empty", DialogueError.InvalidDestination);
+        }
+
+        string[] parts = destination.Split(':');
+        if (parts.Length != 2 || !int.TryParse(parts[0], out int branch) || !int.TryParse(parts[1], out int line))
+        {
+            return new DialogueResult(false, $"Invalid switch destination: {destination}", DialogueError.InvalidDestination);
+        }
+
+        if (!scene.TryGetValue(branch, out var branchData))
+        {
+            return new DialogueResult(false, $"Branch {branch} does not exist", DialogueError.InvalidDestination);
+        }
+
+        if (!branchData.ContainsKey(line))
+        {
+            return new DialogueResult(false, $"Line {line} does not exist in branch {branch}", DialogueError.InvalidDestination);
+        }
+
+        Console.WriteLine($"Switch Destination: {destination}");
+        Console.WriteLine($"Branch: {branch}, Line: {line}");
+        currentBranch = branch;
+        currentLineNum = line;
+        return UpdateLine();
     }
 
-    private void UpdateLine()
+    private DialogueResult UpdateLine()
     {
         while (true)
         {
             if (!scene.ContainsKey(currentBranch))
             {
                 Console.WriteLine("Branch change invalid");
-                return;
+                return new DialogueResult(false);
             }
             if (!scene[currentBranch].ContainsKey(currentLineNum))
             {
                 Console.WriteLine("End of Branch reached.");
                 DialogueState = State.LAST;
-                return;
+                return new DialogueResult(false);
             }
 
             currentLine = scene[currentBranch][currentLineNum];
@@ -227,7 +247,7 @@ public class DialogueManager
             }
             UpdateChoices();
             DialogueState = choices.Count > 0 ? State.CHOICE : State.DIALOGUE;
-            return;
+            return new DialogueResult(true);
         }
     }
 
