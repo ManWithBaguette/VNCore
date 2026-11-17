@@ -138,28 +138,33 @@ public class DialogueManager
 
     private void UpdateLine()
     {
-        if (!scene.ContainsKey(currentBranch))
+        while (true)
         {
-            Console.WriteLine("Branch change invalid");
-            return;
-        }
-        if (!scene[currentBranch].ContainsKey(currentLineNum))
-        {
-            Console.WriteLine("End of Branch reached.");
-            dialogueState = State.LAST;
-            return;
-        }
-        currentLine = scene[currentBranch][currentLineNum];
-        if (saveData != null && currentLine.VNCoreData.TryGetValue("precondition", out var condition))
-        {
-            if (!saveData.Compare(condition))
+            if (!scene.ContainsKey(currentBranch))
             {
-                currentLineNum++;
-                UpdateLine();
+                Console.WriteLine("Branch change invalid");
                 return;
             }
+            if (!scene[currentBranch].ContainsKey(currentLineNum))
+            {
+                Console.WriteLine("End of Branch reached.");
+                dialogueState = State.LAST;
+                return;
+            }
+
+            currentLine = scene[currentBranch][currentLineNum];
+
+            if (saveData != null && currentLine.VNCoreData.TryGetValue("precondition", out var condition))
+            {
+                if (!saveData.Compare(condition))
+                {
+                    currentLineNum++;
+                    continue;
+                }
+            }
+            UpdateChoices();
+            return;
         }
-        UpdateChoices();
     }
 
     private void UpdateChoices()
