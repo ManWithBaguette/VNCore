@@ -41,15 +41,16 @@ public class DialogueManager
     {
         string jsonContent = File.ReadAllText(path);
         scene = JsonSerializer.Deserialize<Dictionary<int, Dictionary<int, DialogueLine>>>(jsonContent);
-        currentLine = scene[1][0];
-        UpdateChoices();
-        if (choices.Count() > 0)
-        {
-            DialogueState = State.CHOICE;
-        }
+        
+        currentBranch = 1;
+        currentLineNum = 0;
+        currentChoice = null;
+        choices.Clear();
+
+        UpdateLine();
     }
 
-    public void SelectChoice(int num) // Assume choice selection in range. <- modify to protect against this actually
+    public void SelectChoice(int num)
     {
         if (DialogueState != State.CHOICE)
         {
