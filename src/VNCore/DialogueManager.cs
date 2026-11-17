@@ -1,4 +1,3 @@
-using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using VNCore.Dialogue;
 
@@ -26,10 +25,6 @@ public class DialogueManager
     
     public DialogueElement? currentChoice;
 
-    private List<DialogueLine> dialogueTree = new();
-
-    private bool skippingLine = false;
-    
     public DialogueManager() {}
 
     public DialogueManager(SaveData saveData)
@@ -55,14 +50,18 @@ public class DialogueManager
 
     public void SelectChoice(int num) // Assume choice selection in range. <- modify to protect against this actually
     {
-        if (! choices.ContainsKey(num))
+        if (dialogueState != State.CHOICE)
+        {
+            return;
+        }
+
+        if (!choices.ContainsKey(num))
         {
             Console.WriteLine("Invalid Choice Selection");
             currentChoice = null;
             return;
         }
         currentChoice = choices[num];
-        choices = new();
     }
 
     public void Advance()
@@ -72,103 +71,74 @@ public class DialogueManager
             case State.DIALOGUE:
                 AdvanceDialogue();
                 break;
+
             case State.CHOICE:
                 AdvanceChoice();
                 break;
+
             case State.LAST:
                 EndDialogue();
                 break;
+
             case State.END:
                 break;
         }
     }
 
-    public void AdvanceDialogue()
+    private void MoveToNextLine()
+    {
+        currentLineNum++;
+        UpdateLine();
+    }
+
+    private void AdvanceDialogue()
     {
         if (saveData != null)
         {
             saveData.Update(currentLine.Metadata);
         }
+
         if (currentLine.VNCoreData.TryGetValue("switch", out string? destination))
         {
             Switch(destination);
             return;
-        } else
+        }
+
+        MoveToNextLine();
+    }
+
+    private void AdvanceChoice()
+    {
+        if (currentChoice == null)
         {
-            Console.WriteLine("No switch");
+            return;
+        }
+        
+        DialogueElement selectedChoice = currentChoice;
+        currentChoice = null;
+
+        if (saveData != null)
+        {
+            saveData.Update(selectedChoice.Metadata);
+        }
+        if (selectedChoice.VNCoreData.TryGetValue("switch", out string? destination))
+        {
+            Console.WriteLine("Switch on Choice");
+            Switch(destination);
+            return;
+        }
+        MoveToNextLine();
+    }
+
+    private void EndDialogue()
+    {
+        if (dialogueState == State.LAST)
+        {
+            dialogueState = State.END;
         }
     }
 
-    public void AdvanceChoice()
-    {
-        
-    }
-
-    public void EndDialogue()
-    {
-        
-    }
-
-    // public void Advance()
-    // {
-    //     if (dialogueState == State.LAST)
-    //     {
-    //         dialogueState = State.END;
-    //         return;
-    //     }
-    //     UpdateChoices();
-
-    //     if (choices.Count > 0)
-    //     {
-    //         dialogueState = State.CHOICE;
-    //     } else
-    //     {
-    //         dialogueState  = State.DIALOGUE;
-    //     }
-
-    //     if (dialogueState == State.CHOICE)
-    //     {
-    //         Console.WriteLine("Currently in choice selection.");
-
-    //         if (currentChoice != null)
-    //         {
-    //             if (saveData != null)
-    //                 saveData.Update(currentChoice.Metadata);
-
-    //             if (currentChoice.VNCoreData.TryGetValue("switch", out string? target))
-    //             {
-    //                 currentChoice = null;
-    //                 Switch(target);
-    //                 return;
-    //             } else
-    //             {
-    //                 Console.WriteLine("Choice with no switch selected.");
-    //                 currentChoice = null;
-    //                 dialogueState = State.DIALOGUE;
-    //             }
-    //         }
-    //     } else if (dialogueState == State.DIALOGUE)
-    //     {
-    //         if (saveData != null)
-    //             saveData.Update(currentLine.Metadata);
-
-
-    //         if (currentLine.VNCoreData.TryGetValue("switch", out string? destination))
-    //         {
-    //             Switch(destination);
-    //             return;
-    //         } else
-    //         {
-    //             Console.WriteLine("No switch");
-    //         }
-    //     }
-        
-    //     currentLineNum++;
-    //     UpdateLine();
-        
-    // }
-
-    public void Switch(string destination)
+    private void Switch(string destination)
     {
         Console.WriteLine($"Destination: {destination}");
         int[] switchDestination = destination.Split(':').Select(int.Parse).ToArray();
@@ -177,7 +147,6 @@ public class DialogueManager
         currentBranch = switchDestination[0];
         currentLineNum = switchDestination[1];
         UpdateLine();
-        UpdateChoices();
     }
 
     private void UpdateLine()
@@ -207,6 +176,7 @@ public class DialogueManager
                 }
             }
             UpdateChoices();
+            dialogueState = choices.Count > 0 ? State.CHOICE : State.DIALOGUE;
             return;
         }
     }
