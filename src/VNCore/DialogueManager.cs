@@ -11,6 +11,12 @@ public enum State
     END
 }
 
+public enum DialogueError
+{
+    None,
+    FileNotFound
+}
+
 public class DialogueManager
 {
     public SaveData? saveData;
@@ -30,6 +36,12 @@ public class DialogueManager
 
     public DialogueElement? CurrentChoice => currentChoice;
 
+    public record DialogueResult(
+        bool Success,
+        string? ErrorMessage = null,
+        DialogueError? Error = DialogueError.None
+    );
+
     public DialogueManager() {}
 
     public DialogueManager(SaveData saveData)
@@ -37,8 +49,12 @@ public class DialogueManager
         this.saveData = saveData;
     }
 
-    public void LoadScene(string path)
+    public DialogueResult LoadScene(string path)
     {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return new DialogueResult(false, "Scene path is empty", DialogueError.FileNotFound);
+        }
         string jsonContent = File.ReadAllText(path);
         scene = JsonSerializer.Deserialize<Dictionary<int, Dictionary<int, DialogueLine>>>(jsonContent);
         
@@ -48,6 +64,7 @@ public class DialogueManager
         choices.Clear();
 
         UpdateLine();
+        return new DialogueResult(true);
     }
 
     public void SelectChoice(int num)
