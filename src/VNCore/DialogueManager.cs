@@ -16,14 +16,19 @@ public class DialogueManager
     public SaveData? saveData;
     private Dictionary<int, Dictionary<int, DialogueLine>> scene = new();
     private DialogueLine currentLine = new();
+    public DialogueLine CurrentLine => currentLine;
     private int currentBranch = 1;
     private int currentLineNum = 0;
 
-    public State dialogueState;
+    public State DialogueState { get; private set; }
 
-    public Dictionary<int, DialogueElement> choices = new();
+    private Dictionary<int, DialogueElement> choices = new();
+
+    public IReadOnlyDictionary<int, DialogueElement> Choices => choices;
     
-    public DialogueElement? currentChoice;
+    private DialogueElement? currentChoice;
+
+    public DialogueElement? CurrentChoice => currentChoice;
 
     public DialogueManager() {}
 
@@ -40,17 +45,13 @@ public class DialogueManager
         UpdateChoices();
         if (choices.Count() > 0)
         {
-            dialogueState = State.CHOICE;
+            DialogueState = State.CHOICE;
         }
-    }
-    public DialogueLine GetCurrentLine()
-    {
-        return currentLine;
     }
 
     public void SelectChoice(int num) // Assume choice selection in range. <- modify to protect against this actually
     {
-        if (dialogueState != State.CHOICE)
+        if (DialogueState != State.CHOICE)
         {
             return;
         }
@@ -66,7 +67,7 @@ public class DialogueManager
 
     public void Advance()
     {
-        switch (dialogueState)
+        switch (DialogueState)
         {
             case State.DIALOGUE:
                 AdvanceDialogue();
@@ -113,7 +114,7 @@ public class DialogueManager
         {
             return;
         }
-        
+
         DialogueElement selectedChoice = currentChoice;
         currentChoice = null;
 
@@ -132,9 +133,9 @@ public class DialogueManager
 
     private void EndDialogue()
     {
-        if (dialogueState == State.LAST)
+        if (DialogueState == State.LAST)
         {
-            dialogueState = State.END;
+            DialogueState = State.END;
         }
     }
 
@@ -161,7 +162,7 @@ public class DialogueManager
             if (!scene[currentBranch].ContainsKey(currentLineNum))
             {
                 Console.WriteLine("End of Branch reached.");
-                dialogueState = State.LAST;
+                DialogueState = State.LAST;
                 return;
             }
 
@@ -176,7 +177,7 @@ public class DialogueManager
                 }
             }
             UpdateChoices();
-            dialogueState = choices.Count > 0 ? State.CHOICE : State.DIALOGUE;
+            DialogueState = choices.Count > 0 ? State.CHOICE : State.DIALOGUE;
             return;
         }
     }

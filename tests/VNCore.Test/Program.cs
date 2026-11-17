@@ -14,17 +14,16 @@ saveManager.LoadSave("");
 var dialogueManager = new DialogueManager(saveManager.Current);
 // var dialogueManager = new DialogueManager();
 dialogueManager.LoadScene("output.json");
-while (dialogueManager.dialogueState != State.END) //Test code. Later probably simplify use of the dialogue manager.
+while (dialogueManager.DialogueState != State.END) //Test code. Later probably simplify use of the dialogue manager.
 {
-    if (dialogueManager.dialogueState != State.LAST)
+    if (dialogueManager.DialogueState != State.LAST)
     {
         choice = 0;
-        DialogueLine line = dialogueManager.GetCurrentLine();
         
-        Console.WriteLine($"Speaker: {line.Speaker}\nLine: {line.Text}\n");
-        if (dialogueManager.choices.Count > 0)
+        Console.WriteLine($"Speaker: {dialogueManager.CurrentLine.Speaker}\nLine: {dialogueManager.CurrentLine.Text}\n");
+        if (dialogueManager.Choices.Count > 0)
         {
-            foreach (var element in dialogueManager.choices)
+            foreach (var element in dialogueManager.Choices)
             {
                 Console.WriteLine($"Choice {element.Key} Text: {element.Value.Text}");
             }
@@ -39,7 +38,7 @@ while (dialogueManager.dialogueState != State.END) //Test code. Later probably s
     {
         dialogueManager.SelectChoice(choice);
     }
-    if (dialogueManager.choices.Count == 0 || dialogueManager.currentChoice != null)
+    if (dialogueManager.Choices.Count == 0 || dialogueManager.CurrentChoice != null)
         dialogueManager.Advance(); // Change, still runs if choice
     
 }
