@@ -11,8 +11,8 @@ Console.WriteLine("Compilation complete!");
 int choice = 0;
 var saveManager = new SaveManager();
 saveManager.LoadSave("");
-var dialogueManager = new DialogueManager(saveManager.Current);
-// var dialogueManager = new DialogueManager();
+// var dialogueManager = new DialogueManager(saveManager.Current);
+var dialogueManager = new DialogueManager();
 dialogueManager.LoadScene("output.json");
 while (dialogueManager.dialogueState != State.END) //Test code. Later probably simplify use of the dialogue manager.
 {

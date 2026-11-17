@@ -164,30 +164,23 @@ public class DialogueManager
 
     private void UpdateChoices()
     {
-        choices = new();
-        if (currentLine.Choices.Count > 0 )
+        choices.Clear();
+        int choiceNum = 0;
+
+        foreach (var choice in currentLine.Choices)
         {
-            var choiceList = currentLine.Choices;
-            int choiceNum = 0;
-            foreach (var choice in choiceList)
+            bool available = true;
+
+            if (choice.Value.VNCoreData.TryGetValue("precondition", out string? parameter))
             {
-                if (saveData != null)
-                {
-                    if (choice.Value.VNCoreData.TryGetValue("precondition", out string? parameter))
-                    {
-                        Console.WriteLine("Precondition Detected");
-                        if (saveData.Compare(parameter))
-                        {
-                            Console.WriteLine("Comparison Passed");
-                            choiceNum ++;
-                            choices[choiceNum] = choice.Value;
-                        }
-                    } else
-                    {
-                        choiceNum ++;
-                        choices[choiceNum] = choice.Value;
-                    }
-                }
+                Console.WriteLine("Precondition Detected");
+                available = saveData != null && saveData.Compare(parameter);
+            }
+
+            if (available)
+            {
+                choiceNum++;
+                choices[choiceNum] = choice.Value;
             }
         }
         
