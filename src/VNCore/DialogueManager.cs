@@ -223,28 +223,36 @@ public class DialogueManager
     {
         while (true)
         {
-            if (!scene.ContainsKey(currentBranch))
+            if (!scene.TryGetValue(currentBranch, out var branch))
             {
                 Console.WriteLine("Branch change invalid");
-                return new DialogueResult(false);
+                return new DialogueResult(false, $"Branch {currentBranch} does not exist");
             }
-            if (!scene[currentBranch].ContainsKey(currentLineNum))
+            if (!branch.TryGetValue(currentLineNum, out var line))
             {
                 Console.WriteLine("End of Branch reached.");
+                currentChoice = null;
+                choices.Clear();
                 DialogueState = State.LAST;
-                return new DialogueResult(false);
+                return new DialogueResult(true);
             }
 
-            currentLine = scene[currentBranch][currentLineNum];
-
-            if (saveData != null && currentLine.VNCoreData.TryGetValue("precondition", out var condition))
+            if (line == null)
             {
-                if (!saveData.Compare(condition))
+                return new DialogueResult(false, $"Line {currentLineNum} in branch {currentBranch} is null");
+            }
+
+            currentLine = line;
+
+            if (currentLine.VNCoreData.TryGetValue("precondition", out var condition))
+            {
+                if (saveData == null || (saveData != null && !saveData.Compare(condition)))
                 {
                     currentLineNum++;
                     continue;
-                }
+                } 
             }
+
             UpdateChoices();
             DialogueState = choices.Count > 0 ? State.CHOICE : State.DIALOGUE;
             return new DialogueResult(true);
