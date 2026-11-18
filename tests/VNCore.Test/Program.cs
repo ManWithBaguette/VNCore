@@ -5,7 +5,7 @@ using VNCore.DialogueManager;
 
 var compiler = new ScriptCompiler();
 
-compiler.Compile("test-data/test.txt", "scene1");
+compiler.Compile("test-data/refactorTest.txt", "refactor");
 
 Console.WriteLine("Compilation complete!");
 // int choice = 0;

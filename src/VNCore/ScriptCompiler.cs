@@ -3,19 +3,9 @@ using VNCore.Dialogue;
 
 namespace VNCore.Compiler;
 
-enum State
-{
-    SettingSpeaker,
-    SettingText,
-    SettingLineData,
-    SettingChoice,
-    SettingChoiceText,
-    SettingChoiceData,
-
-}
-
 enum MainState
-{
+{  
+    None,
     SettingSpeaker,
     SettingText,
     SettingLineData
@@ -23,6 +13,7 @@ enum MainState
 
 enum BlockState
 {
+    None,
     SettingMetadata,
     SettingChoice,
     SettingChoiceText,
@@ -50,7 +41,8 @@ public class ScriptCompiler
 
     ];
 
-    private State state;
+    private MainState mainState;
+    private BlockState blockState;
 
     public void Compile(string filepath, string outputPath)
     {
@@ -67,55 +59,67 @@ public class ScriptCompiler
         {   
             lines = new Dictionary<int, DialogueLine>();
             scene[branchId] = lines;
-            state = State.SettingSpeaker;
+            mainState = MainState.SettingSpeaker;
             lineId = -1;
         
             foreach (var line in File.ReadLines(fileQueue.Dequeue()))
             {
                 var trimmed = line.Trim();
 
+                UpdateState(trimmed);
 
-                switch (state)
+
+                switch (mainState)
                 {
-                    case State.SettingSpeaker:
+                    case MainState.SettingSpeaker:
                         SetSpeaker(trimmed);
                         Console.WriteLine("Speaker Set");
                         break;
 
-                    case State.SettingText: 
-                        SetText(trimmed);
+                    case MainState.SettingText: 
+                        // SetText(trimmed);
                         break;
                     
-                    case State.SettingLineData:
-
-                        SetData(trimmed);
-                        
+                    case MainState.SettingLineData:
+                        // SetData(trimmed);
                         break;
 
-                    case State.SettingChoice:
-                        CreateChoice(trimmed);
+                    // case MainState.SettingLineData:
+                    
+                    //     break;
+                    // case State.SettingChoice:
+                    //     CreateChoice(trimmed);
 
-                        break;
-                    case State.SettingChoiceText:
-                        SetText(trimmed);
-                        break;
-                    case State.SettingChoiceData:
-                        SetData(trimmed);
-                        break;
-
+                    //     break;
+                    // case State.SettingChoiceText:
+                    //     SetText(trimmed);
+                    //     break;
+                    // case State.SettingChoiceData:
+                    //     SetData(trimmed);
+                    //     break;
                 }
 
+                if (mainState == MainState.SettingLineData)
+                {
+                    switch (blockState)
+                    {
+                        case BlockState.SettingMetadata:
+                            break;
+                    }
+                }
+                
+
             }
 
-            if (!string.IsNullOrWhiteSpace(lineText))
-            {
-                if (state == State.SettingText) 
-                    scene[branchId][lineId].Text = lineText;
-                else if (state == State.SettingChoiceText)
-                    scene[branchId][lineId].Choices[choiceId].Text = lineText;
+            // if (!string.IsNullOrWhiteSpace(lineText))
+            // {
+            //     if (state == State.SettingText) 
+            //         scene[branchId][lineId].Text = lineText;
+            //     else if (state == State.SettingChoiceText)
+            //         scene[branchId][lineId].Choices[choiceId].Text = lineText;
 
-                lineText = "";
-            }
+            //     lineText = "";
+            // }
             
             branchId ++;
         }
@@ -124,33 +128,33 @@ public class ScriptCompiler
         File.WriteAllText($"scenes\\{outputPath}.json", json);
     }
 
-    private void SetText(string line)
-    {
-        if (line.Contains(':') || string.IsNullOrWhiteSpace(line))
-        {
-            if (state == State.SettingText)
-            {
-                scene[branchId][lineId].Text = lineText;
-                state = State.SettingLineData;
-            }
-            if (state == State.SettingChoiceText)
-            {
-                scene[branchId][lineId].Choices[choiceId].Text = lineText;
-                state = State.SettingChoiceData;
-            }
-            Console.WriteLine(
-                $"Saving line {lineId}: " +
-                $"speaker='{scene[branchId][lineId].Speaker}', " +
-                $"text='{lineText}'"
-            );
-            lineText = "";
-            SetData(line);
-            return;
-        }
+    // private void SetText(string line)
+    // {
+    //     if (line.Contains(':') || string.IsNullOrWhiteSpace(line))
+    //     {
+    //         if (mainState == MainState.SettingText)
+    //         {
+    //             scene[branchId][lineId].Text = lineText;
+    //             mainState = MainState.SettingLineData;
+    //         }
+    //         if (state == State.SettingChoiceText)
+    //         {
+    //             scene[branchId][lineId].Choices[choiceId].Text = lineText;
+    //             state = State.SettingChoiceData;
+    //         }
+    //         Console.WriteLine(
+    //             $"Saving line {lineId}: " +
+    //             $"speaker='{scene[branchId][lineId].Speaker}', " +
+    //             $"text='{lineText}'"
+    //         );
+    //         lineText = "";
+    //         // SetData(line);
+    //         return;
+    //     }
         
-        lineText += (lineText.Length > 0 ? " " : "") + line;
-        Console.WriteLine($"Text Added: {line}");
-    }
+    //     lineText += (lineText.Length > 0 ? " " : "") + line;
+    //     Console.WriteLine($"Text Added: {line}");
+    // }
 
     private void SetSpeaker(string line)
     {
@@ -165,7 +169,7 @@ public class ScriptCompiler
             lines[lineId] = new DialogueLine {Speaker = line[..colonIndex].Trim()};
 
             lineText = line[(colonIndex + 1)..].Trim();
-            state = State.SettingText;
+            mainState = MainState.SettingText;
         }
     }
 
@@ -177,107 +181,113 @@ public class ScriptCompiler
         {
             lineText = line.Contains(':') ? line[(line.IndexOf(':') + 1)..].Trim() : line;
         }
-        state = State.SettingChoiceText;
+        blockState = BlockState.SettingChoiceText;
     }
-    private void SetData(string line)
+    // private void SetData(string line)
+    // {
+    //     if (string.IsNullOrWhiteSpace(line))
+    //     {
+    //         state = State.SettingSpeaker;
+    //         return;
+    //     }
+
+    //     int colonIndex = line.IndexOf(':');
+    //     string flag = line[..colonIndex].Trim();
+    //     string parameter = line[(colonIndex + 1)..].Trim();
+        
+    //     bool isCoreData = CoreDataFlags.Contains(flag.ToLower());
+
+        
+    //     if (flag == "switch")
+    //     {
+
+    //         string switchTarget;
+
+    //         if (int.TryParse(parameter, out int value))
+    //         {
+    //             switchTarget = $"0:{value}";
+    //         }
+    //         else if (parameter.Contains(':'))
+    //         {
+    //             Dictionary<string, string> switchParameters = new();
+    //             string[] parts = parameter.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+    //             foreach (string part in parts)
+    //             {
+    //                 string[] keyValue = part.Split(':', 2);
+    //                 switchParameters[keyValue[0]] = keyValue[1];
+    //             }
+
+    //             if (switchParameters.TryGetValue("path", out string? target))
+    //             {
+    //                 if (!compiledFiles.Contains(target))
+    //                 {
+    //                     fileQueue.Enqueue(target);
+    //                     compiledFiles.Add(target);
+    //                 }
+    //                 switchTarget = compiledFiles.IndexOf(target).ToString();
+    //             } else
+    //                 switchTarget = branchId.ToString();
+
+    //             if (switchParameters.TryGetValue("line", out string? lineValue))
+    //             {
+    //                 switchTarget = $"{switchTarget}:{lineValue}";
+    //             }
+    //         }
+    //         else
+    //             switchTarget = $"{compiledFiles.IndexOf(parameter)}:0";
+
+    //         if (state == State.SettingLineData)
+    //             scene[branchId][lineId].VNCoreData[flag] = switchTarget;
+    //         else if (state == State.SettingChoiceData)
+    //             scene[branchId][lineId].Choices[choiceId].VNCoreData[flag] = switchTarget;
+
+    //         Console.WriteLine("Switch flag set");
+    //         return;
+
+    //     } else if (flag == "choice" && state == State.SettingLineData) {
+    //         state = State.SettingChoice;
+    //     } else if (int.TryParse(flag, out int value) && state == State.SettingChoiceData)
+    //     {
+    //         choiceId ++;
+    //         scene[branchId][lineId].Choices[choiceId] = new DialogueElement();
+    //         lineText = parameter;
+    //         state = State.SettingChoiceText;
+    //     }
+
+    //     if (isCoreData)
+    //     {
+    //         if (state == State.SettingLineData)
+    //         {
+    //             scene[branchId][lineId].VNCoreData[flag] = parameter;
+    //             Console.WriteLine("LineData Set");
+    //         }
+    //         else if (state == State.SettingChoiceData)
+    //         {
+    //             scene[branchId][lineId].Choices[choiceId].VNCoreData[flag] = parameter;
+    //             Console.WriteLine("ChoiceData Set");
+    //         }
+    //     } else
+    //     {
+    //         if (state == State.SettingLineData)
+    //         {
+    //             scene[branchId][lineId].Metadata[flag] = parameter;
+    //             Console.WriteLine("LineData Set");
+    //         }
+    //         else if (state == State.SettingChoiceData)
+    //         {
+    //             scene[branchId][lineId].Choices[choiceId].Metadata[flag] = parameter;
+    //             Console.WriteLine("ChoiceData Set");
+    //         }
+    //     }
+
+    // }
+
+    private void UpdateState(string line)
     {
-        if (string.IsNullOrWhiteSpace(line))
-        {
-            state = State.SettingSpeaker;
-            return;
-        }
-
-        int colonIndex = line.IndexOf(':');
-        string flag = line[..colonIndex].Trim();
-        string parameter = line[(colonIndex + 1)..].Trim();
         
-        bool isCoreData = CoreDataFlags.Contains(flag.ToLower());
-
-        
-        if (flag == "switch")
-        {
-
-            string switchTarget;
-
-            if (int.TryParse(parameter, out int value))
-            {
-                switchTarget = $"0:{value}";
-            }
-            else if (parameter.Contains(':'))
-            {
-                Dictionary<string, string> switchParameters = new();
-                string[] parts = parameter.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-                foreach (string part in parts)
-                {
-                    string[] keyValue = part.Split(':', 2);
-                    switchParameters[keyValue[0]] = keyValue[1];
-                }
-
-                if (switchParameters.TryGetValue("path", out string? target))
-                {
-                    if (!compiledFiles.Contains(target))
-                    {
-                        fileQueue.Enqueue(target);
-                        compiledFiles.Add(target);
-                    }
-                    switchTarget = compiledFiles.IndexOf(target).ToString();
-                } else
-                    switchTarget = branchId.ToString();
-
-                if (switchParameters.TryGetValue("line", out string? lineValue))
-                {
-                    switchTarget = $"{switchTarget}:{lineValue}";
-                }
-            }
-            else
-                switchTarget = $"{compiledFiles.IndexOf(parameter)}:0";
-
-            if (state == State.SettingLineData)
-                scene[branchId][lineId].VNCoreData[flag] = switchTarget;
-            else if (state == State.SettingChoiceData)
-                scene[branchId][lineId].Choices[choiceId].VNCoreData[flag] = switchTarget;
-
-            Console.WriteLine("Switch flag set");
-            return;
-
-        } else if (flag == "choice" && state == State.SettingLineData) {
-            state = State.SettingChoice;
-        } else if (int.TryParse(flag, out int value) && state == State.SettingChoiceData)
-        {
-            choiceId ++;
-            scene[branchId][lineId].Choices[choiceId] = new DialogueElement();
-            lineText = parameter;
-            state = State.SettingChoiceText;
-        }
-
-        if (isCoreData)
-        {
-            if (state == State.SettingLineData)
-            {
-                scene[branchId][lineId].VNCoreData[flag] = parameter;
-                Console.WriteLine("LineData Set");
-            }
-            else if (state == State.SettingChoiceData)
-            {
-                scene[branchId][lineId].Choices[choiceId].VNCoreData[flag] = parameter;
-                Console.WriteLine("ChoiceData Set");
-            }
-        } else
-        {
-            if (state == State.SettingLineData)
-            {
-                scene[branchId][lineId].Metadata[flag] = parameter;
-                Console.WriteLine("LineData Set");
-            }
-            else if (state == State.SettingChoiceData)
-            {
-                scene[branchId][lineId].Choices[choiceId].Metadata[flag] = parameter;
-                Console.WriteLine("ChoiceData Set");
-            }
-        }
-
     }
+
 }
 
 
