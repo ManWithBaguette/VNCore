@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using System.Drawing;
 using System.Text.Json;
 using VNCore.Dialogue;
 
@@ -16,6 +14,20 @@ enum State
 
 }
 
+enum MainState
+{
+    SettingSpeaker,
+    SettingText,
+    SettingLineData
+}
+
+enum BlockState
+{
+    SettingMetadata,
+    SettingChoice,
+    SettingChoiceText,
+    SettingChoiceData
+}
 
 public class ScriptCompiler
 {
@@ -26,6 +38,8 @@ public class ScriptCompiler
     private string lineText = "";
     private int lineId;
     private int choiceId;
+
+    private Dictionary<int, DialogueLine> lines = [];
 
     private List<String> CoreDataFlags = [
         "switch",
@@ -51,7 +65,7 @@ public class ScriptCompiler
 
         while (fileQueue.Count > 0)
         {   
-            Dictionary<int, DialogueLine> lines = new Dictionary<int, DialogueLine>();
+            lines = new Dictionary<int, DialogueLine>();
             scene[branchId] = lines;
             state = State.SettingSpeaker;
             lineId = -1;
@@ -64,19 +78,7 @@ public class ScriptCompiler
                 switch (state)
                 {
                     case State.SettingSpeaker:
-                        if (string.IsNullOrWhiteSpace(trimmed))
-                            continue;
-
-                        int colonIndex = trimmed.IndexOf(':');
-
-                        if (colonIndex != -1)
-                        {
-                            lineId ++;
-                            lines[lineId] = new DialogueLine {Speaker = trimmed[..colonIndex].Trim()};
-
-                            lineText = trimmed[(colonIndex + 1)..].Trim();
-                            state = State.SettingText;
-                        }
+                        SetSpeaker(trimmed);
                         Console.WriteLine("Speaker Set");
                         break;
 
@@ -86,20 +88,12 @@ public class ScriptCompiler
                     
                     case State.SettingLineData:
 
-                        // Optionally remove VNCoreData and only have metadata, or add if cases here to sort between VNCoreData and other Metadata
-                        // Consider making a conditional dictionary nested inside the metadata dictionaries for if cases in metadata. i.e. if x, anne: anger+3
                         SetData(trimmed);
                         
                         break;
 
                     case State.SettingChoice:
-                        choiceId = 1;
-                        scene[branchId][lineId].Choices[choiceId] = new DialogueElement();
-                        if (!string.IsNullOrWhiteSpace(trimmed))
-                        {
-                            lineText = trimmed.Contains(':') ? trimmed[(trimmed.IndexOf(':') + 1)..].Trim() : trimmed;
-                        }
-                        state = State.SettingChoiceText;
+                        CreateChoice(trimmed);
 
                         break;
                     case State.SettingChoiceText:
@@ -156,39 +150,34 @@ public class ScriptCompiler
         
         lineText += (lineText.Length > 0 ? " " : "") + line;
         Console.WriteLine($"Text Added: {line}");
+    }
 
+    private void SetSpeaker(string line)
+    {
+        if (string.IsNullOrWhiteSpace(line))
+            return;
 
-        // bool startsText = line.StartsWith('"');
-        // bool endsText = line.EndsWith('"');
+        int colonIndex = line.IndexOf(':');
 
-        // if (startsText && line.Length > 1)
-        //     line = line[1..];
+        if (colonIndex != -1)
+        {
+            lineId ++;
+            lines[lineId] = new DialogueLine {Speaker = line[..colonIndex].Trim()};
 
-        // if (endsText && line.Length > 0)
-        //     line = line[..^1];
+            lineText = line[(colonIndex + 1)..].Trim();
+            state = State.SettingText;
+        }
+    }
 
-        // lineText += (lineText.Length > 0 ? " " : "") + line;
-
-        // if (endsText)
-        // {
-        //     if (state == State.SettingText) {
-        //         scene[branchId][lineId].Text = lineText;
-        //         state = State.SettingLineData;
-        //     } else if (state == State.SettingChoiceText) {
-        //         scene[branchId][lineId].Choices[choiceId].Text = lineText;
-        //         Console.WriteLine($"Choice Text: {lineText}");
-        //         state = State.SettingChoiceData;
-        //     }
-            
-        //     Console.WriteLine(
-        //         $"Saving line {lineId}: " +
-        //         $"speaker='{scene[branchId][lineId].Speaker}', " +
-        //         $"text='{scene[branchId][lineId].Text}'"
-        //     );
-
-        //     lineText = "";
-        // }
-        // Console.WriteLine("Text Set");
+    private void CreateChoice(string line)
+    {
+        choiceId = 1;
+        scene[branchId][lineId].Choices[choiceId] = new DialogueElement();
+        if (!string.IsNullOrWhiteSpace(line))
+        {
+            lineText = line.Contains(':') ? line[(line.IndexOf(':') + 1)..].Trim() : line;
+        }
+        state = State.SettingChoiceText;
     }
     private void SetData(string line)
     {
