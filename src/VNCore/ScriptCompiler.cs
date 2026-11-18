@@ -1,5 +1,6 @@
 using System.Text.Json;
 using VNCore.Dialogue;
+using VNCore.DialogueManager;
 
 namespace VNCore.Compiler;
 
@@ -29,6 +30,9 @@ public class ScriptCompiler
     private string lineText = "";
     private int lineId;
     private int choiceId;
+
+    private string dataFlag;
+    private string dataParameter;
 
     private Dictionary<int, DialogueLine> lines = [];
 
@@ -64,9 +68,10 @@ public class ScriptCompiler
         
             foreach (var line in File.ReadLines(fileQueue.Dequeue()))
             {
-                var trimmed = line.Trim();
+                int indentation = GetIndentation(line);
+                string trimmed = line.Trim();
 
-                UpdateState(trimmed);
+                UpdateState(trimmed, indentation);
 
 
                 switch (mainState)
@@ -283,9 +288,68 @@ public class ScriptCompiler
 
     // }
 
-    private void UpdateState(string line)
+    private void UpdateState(string line, int indentation)
     {
-        
+        if (mainState == MainState.None)
+        {
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                return;
+            }
+            mainState = MainState.SettingSpeaker;
+        }
+        else if (mainState == MainState.SettingSpeaker)
+        {
+            mainState = MainState.SettingText;
+        }
+        else if (mainState == MainState.SettingText)
+        {
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                mainState = MainState.None;
+            }
+            if (indentation == 1 && line.Contains(':'))
+            {
+                mainState = MainState.SettingLineData;
+            }
+        }
+
+        if (mainState == MainState.SettingLineData)
+        {   
+
+            if (line.Contains(':'))
+            {
+                dataFlag = line[..line.IndexOf(':')].ToLower();
+                dataParameter = line[(line.IndexOf(':') + 1)..];
+
+            }
+
+            if (dataFlag == "choice")
+            {
+                blockState = BlockState.SettingChoice;
+            }
+            else if (blockState == BlockState.SettingChoice)
+            {
+                blockState = BlockState.SettingChoiceText;
+            }
+        }
+
+    }
+
+    private int GetIndentation(string line)
+    {
+        int count = 0;
+
+        foreach (char c in line)
+        {
+            if (c == ' ')
+                count ++;
+            else if (c == '\t')
+                count += 4;
+            else
+                break;
+        }
+        return count / 4;
     }
 
 }
