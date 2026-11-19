@@ -164,19 +164,9 @@ public class ScriptCompiler
 
     private void SetSpeaker(string line)
     {
-        if (string.IsNullOrWhiteSpace(line))
-            return;
-
-        int colonIndex = line.IndexOf(':');
-
-        if (colonIndex != -1)
-        {
-            lineId ++;
-            lines[lineId] = new DialogueLine {Speaker = line[..colonIndex].Trim()};
-
-            lineText = line[(colonIndex + 1)..].Trim();
-            mainState = MainState.SettingText;
-        }
+        lineId ++;
+        lines[lineId] = new DialogueLine {Speaker = lineFlag.Trim()};
+        lineText = lineParameter.Trim();
     }
 
     private void CreateChoice(string line)
@@ -300,7 +290,7 @@ public class ScriptCompiler
 
         if (line.Contains(':'))
         {
-            lineFlag = line[..line.IndexOf(':')].ToLower();
+            lineFlag = line[..line.IndexOf(':')];
             lineParameter = line[(line.IndexOf(':') + 1)..];
         }
         else
@@ -346,7 +336,7 @@ public class ScriptCompiler
 
             switch (indentation) {
                 case 1:
-                    if (lineFlag == "choice")
+                    if (lineFlag.Equals("choice", StringComparison.CurrentCultureIgnoreCase))
                     {
                         blockState = BlockState.SettingChoice;
                     }
