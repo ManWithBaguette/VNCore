@@ -64,7 +64,6 @@ public class ScriptCompiler
         {   
             lines = new Dictionary<int, DialogueLine>();
             scene[branchId] = lines;
-            mainState = MainState.SettingSpeaker;
             lineId = -1;
         
             foreach (var line in File.ReadLines(fileQueue.Dequeue()))
@@ -83,7 +82,7 @@ public class ScriptCompiler
                         break;
 
                     case MainState.SettingText: 
-                        // SetText(trimmed);
+                        SetText(trimmed);
                         break;
                     
                     case MainState.SettingLineData:
@@ -134,33 +133,26 @@ public class ScriptCompiler
         File.WriteAllText($"scenes\\{outputPath}.json", json);
     }
 
-    // private void SetText(string line)
-    // {
-    //     if (line.Contains(':') || string.IsNullOrWhiteSpace(line))
-    //     {
-    //         if (mainState == MainState.SettingText)
-    //         {
-    //             scene[branchId][lineId].Text = lineText;
-    //             mainState = MainState.SettingLineData;
-    //         }
-    //         if (state == State.SettingChoiceText)
-    //         {
-    //             scene[branchId][lineId].Choices[choiceId].Text = lineText;
-    //             state = State.SettingChoiceData;
-    //         }
-    //         Console.WriteLine(
-    //             $"Saving line {lineId}: " +
-    //             $"speaker='{scene[branchId][lineId].Speaker}', " +
-    //             $"text='{lineText}'"
-    //         );
-    //         lineText = "";
-    //         // SetData(line);
-    //         return;
-    //     }
-        
-    //     lineText += (lineText.Length > 0 ? " " : "") + line;
-    //     Console.WriteLine($"Text Added: {line}");
-    // }
+    private void SetText(string line)
+    {
+        lineText += (lineText.Length > 0 ? " " : "") + line;
+        Console.WriteLine($"Text Added: {line}");
+
+        if (mainState == MainState.SettingText)
+        {
+            scene[branchId][lineId].Text = lineText;
+        }
+        else if (blockState == BlockState.SettingChoiceText)
+        {
+            scene[branchId][lineId].Choices[choiceId].Text = lineText;
+        }
+
+        Console.WriteLine(
+            $"Saving line {lineId}: " +
+            $"speaker='{scene[branchId][lineId].Speaker}', " +
+            $"text='{lineText}'"
+        );
+    }
 
     private void SetSpeaker(string line)
     {
