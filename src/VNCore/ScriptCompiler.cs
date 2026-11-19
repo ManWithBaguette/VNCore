@@ -17,6 +17,7 @@ enum BlockState
     None,
     SettingMetadata,
     SettingChoice,
+    AddingChoice,
     SettingChoiceText,
     SettingChoiceData
 }
@@ -31,8 +32,8 @@ public class ScriptCompiler
     private int lineId;
     private int choiceId;
 
-    private string dataFlag;
-    private string dataParameter;
+    private string lineFlag = "";
+    private string lineParameter = "";
 
     private Dictionary<int, DialogueLine> lines = [];
 
@@ -71,7 +72,7 @@ public class ScriptCompiler
                 int indentation = GetIndentation(line);
                 string trimmed = line.Trim();
 
-                UpdateState(trimmed, indentation);
+                UpdateMainState(trimmed, indentation);
 
 
                 switch (mainState)
@@ -288,26 +289,43 @@ public class ScriptCompiler
 
     // }
 
-    private void UpdateState(string line, int indentation)
+    private void UpdateMainState(string line, int indentation)
     {
+        if (string.IsNullOrWhiteSpace(line))
+        {
+            mainState = MainState.None;
+            blockState = BlockState.None;
+            return;
+        }
+
+        if (line.Contains(':'))
+        {
+            lineFlag = line[..line.IndexOf(':')].ToLower();
+            lineParameter = line[(line.IndexOf(':') + 1)..];
+        }
+        else
+        {
+            lineFlag = "";
+            lineParameter = "";
+        }
+
         if (mainState == MainState.None)
         {
-            if (string.IsNullOrWhiteSpace(line))
-            {
-                return;
-            }
             mainState = MainState.SettingSpeaker;
         }
         else if (mainState == MainState.SettingSpeaker)
         {
-            mainState = MainState.SettingText;
+            if (indentation == 1 && line.Contains(':'))
+            {
+                mainState = MainState.SettingLineData;
+            }
+            else
+            {
+                mainState = MainState.SettingText;
+            }
         }
         else if (mainState == MainState.SettingText)
         {
-            if (string.IsNullOrWhiteSpace(line))
-            {
-                mainState = MainState.None;
-            }
             if (indentation == 1 && line.Contains(':'))
             {
                 mainState = MainState.SettingLineData;
@@ -316,26 +334,46 @@ public class ScriptCompiler
 
         if (mainState == MainState.SettingLineData)
         {   
-
-            if (line.Contains(':'))
-            {
-                dataFlag = line[..line.IndexOf(':')].ToLower();
-                dataParameter = line[(line.IndexOf(':') + 1)..];
-
-            }
-
-            if (dataFlag == "choice")
-            {
-                blockState = BlockState.SettingChoice;
-            }
-            else if (blockState == BlockState.SettingChoice)
-            {
-                blockState = BlockState.SettingChoiceText;
-            }
+            UpdateBlockState(line, indentation);
         }
 
     }
 
+    private void UpdateBlockState(string line, int indentation)
+    {
+        if (line.Contains(':') && indentation > 0)
+        {
+
+            switch (indentation) {
+                case 1:
+                    if (lineFlag == "choice")
+                    {
+                        blockState = BlockState.SettingChoice;
+                    }
+                    else
+                    {
+                        blockState = BlockState.SettingMetadata;
+                    }
+                    return;
+
+                case 2:
+                    if (lineFlag.StartsWith("choice-"))
+                    {    
+                        blockState = BlockState.AddingChoice;
+                    }
+                    return;
+
+                case 3:
+                    blockState = BlockState.SettingChoiceData;
+                    return;
+            }
+        }
+        else if (blockState == BlockState.AddingChoice)
+        {
+            blockState = BlockState.SettingChoiceText; // implicitly only allowed at 0 or 2 indents. including flags and being at other indents may cause issues
+            return;
+        }
+    }
     private int GetIndentation(string line)
     {
         int count = 0;
