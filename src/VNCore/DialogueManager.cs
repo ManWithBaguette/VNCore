@@ -57,7 +57,7 @@ public class DialogueManager
     public record DialogueResult(
         bool Success,
         string? ErrorMessage = null,
-        DialogueError? Error = DialogueError.None,
+        DialogueError Error = DialogueError.None,
         int? Branch = null,
         int? Line = null
     );
@@ -71,6 +71,8 @@ public class DialogueManager
 
     public DialogueResult LoadScene(string path)
     {
+        UnloadScene();
+
         if (string.IsNullOrWhiteSpace(path))
         {
             return new DialogueResult(false, "Scene path is empty", DialogueError.FileNotFound);
@@ -114,15 +116,14 @@ public class DialogueManager
 
         scene = loadedScene!;
 
-        currentBranch = 0;
-        currentLineNum = 0;
-        currentChoice = null;
-        choices.Clear();
 
         try
         {
             DialogueResult result =  UpdateLine();
-            OnSceneLoaded?.Invoke();
+            if (result.Success)
+            {
+                OnSceneLoaded?.Invoke();
+            }
             return result;
         }
         catch (DialogueException ex)
@@ -142,7 +143,6 @@ public class DialogueManager
         if (!choices.TryGetValue(num, out var choice))
         {
             Console.WriteLine("Invalid Choice Selection");
-            currentChoice = null;
             return new DialogueResult(false, $"Choice {num} is unavailable", DialogueError.InvalidChoice);
         }
         currentChoice = choice;
@@ -277,6 +277,9 @@ public class DialogueManager
                 currentChoice = null;
                 choices.Clear();
                 DialogueState = State.LAST;
+
+                OnChoicesUpdated?.Invoke(choices);
+
                 return new DialogueResult(true);
             }
 
@@ -285,14 +288,8 @@ public class DialogueManager
                 throw new DialogueException(DialogueError.InvalidScene, $"Line {currentLineNum} in branch {currentBranch} is null", currentBranch, currentLineNum);
             }
 
-            currentLine = line;
+            currentLine = new DialogueLine(line);
 
-            if (line.Text.StartsWith("$\""))
-            {
-                line.Text = ReplaceFString(line.Text);
-            }
-
-            OnDialogueChanged?.Invoke(currentLine);
 
             if (currentLine.VNCoreData.TryGetValue("precondition", out var condition))
             {
@@ -303,12 +300,17 @@ public class DialogueManager
                 } 
             }
 
+            if (currentLine.Text.StartsWith("$\""))
+            {
+                currentLine.Text = ReplaceFString(CurrentLine.Text);
+            }
+
+            OnDialogueChanged?.Invoke(currentLine);
+
             UpdateChoices();
             DialogueState = choices.Count > 0 ? State.CHOICE : State.DIALOGUE;
-            if (DialogueState == State.CHOICE)
-            {
-                OnChoicesUpdated?.Invoke(Choices);
-            }
+
+            OnChoicesUpdated?.Invoke(Choices);
             return new DialogueResult(true);
         }
     }
@@ -317,7 +319,6 @@ public class DialogueManager
     {
         choices.Clear();
         currentChoice = null;
-        int choiceNum = 0;
 
         foreach (var choice in currentLine.Choices)
         {
@@ -329,26 +330,30 @@ public class DialogueManager
                 available = saveData != null && saveData.Compare(parameter);
             }
 
-            if (available)
+            if (!available)
             {
-                choiceNum++;
-                choices[choiceNum] = choice.Value;
-                if (choices[choiceNum].Text.StartsWith("$\""))
-                {
-                    choices[choiceNum].Text = ReplaceFString(choices[choiceNum].Text);
-                }
+                continue;
             }
+
+            choices[choice.Key] = new DialogueElement(choice.Value);
+
+            if (choices[choice.Key].Text.StartsWith("$\""))
+            {
+                choices[choice.Key].Text = ReplaceFString(choices[choice.Key].Text);
+            }
+            
         }
         
     }
 
     private string ReplaceFString(string fString)
     {
+        string text = fString[2..^1];
+
         if (saveData == null)
         {
-            return fString;
+            return text;
         }
-        string text = fString[2..];
 
         return Regex.Replace(text, @"\{([^{}]+)\}", match =>
         {
