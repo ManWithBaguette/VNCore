@@ -38,6 +38,10 @@ public class DialogueManager
 
     public DialogueElement? CurrentChoice => currentChoice;
 
+    public event Action<DialogueLine>? OnDialogueChanged;
+    public event Action<IReadOnlyDictionary<int, DialogueElement>>? OnChoicesUpdated;
+    public event Action? OnDialogueEnded;
+
     public record DialogueResult(
         bool Success,
         string? ErrorMessage = null,
@@ -185,6 +189,7 @@ public class DialogueManager
         if (DialogueState == State.LAST)
         {
             DialogueState = State.END;
+            OnDialogueEnded?.Invoke();
         }
     }
 
@@ -243,6 +248,8 @@ public class DialogueManager
 
             currentLine = line;
 
+            OnDialogueChanged?.Invoke(currentLine);
+
             if (currentLine.VNCoreData.TryGetValue("precondition", out var condition))
             {
                 if (saveData == null || (saveData != null && !saveData.Compare(condition)))
@@ -254,6 +261,10 @@ public class DialogueManager
 
             UpdateChoices();
             DialogueState = choices.Count > 0 ? State.CHOICE : State.DIALOGUE;
+            if (DialogueState == State.CHOICE)
+            {
+                OnChoicesUpdated?.Invoke(Choices);
+            }
             return new DialogueResult(true);
         }
     }
@@ -261,6 +272,7 @@ public class DialogueManager
     private void UpdateChoices()
     {
         choices.Clear();
+        currentChoice = null;
         int choiceNum = 0;
 
         foreach (var choice in currentLine.Choices)
