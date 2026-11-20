@@ -1,6 +1,5 @@
 using System.Text.Json;
 using VNCore.Dialogue;
-using VNCore.DialogueManager;
 
 namespace VNCore.Compiler;
 
@@ -27,44 +26,38 @@ public class ScriptCompiler
     private Dictionary<int, Dictionary<int, DialogueLine>> scene = [];
     private Queue<string> fileQueue = new();
     private List<string> compiledFiles = new();
+
     private int branchId;
-    private string lineText = "";
     private int lineId;
     private int choiceId;
 
+    private string lineText = "";
     private string lineFlag = "";
     private string lineParameter = "";
 
-    private Dictionary<int, DialogueLine> lines = [];
+    private Dictionary<int, DialogueLine> lines = new Dictionary<int, DialogueLine>();
+    private MainState mainState;
+    private BlockState blockState;
 
-    private List<String> CoreDataFlags = [
+    private readonly List<String> CoreDataFlags = [
         "switch",
         "condition",
         "precondition",
         "postcondition",
-
-
     ];
-
-    private MainState mainState;
-    private BlockState blockState;
 
     public void Compile(string filepath, string outputPath)
     {
-        scene = new Dictionary<int, Dictionary<int, DialogueLine>>();
-        compiledFiles = new List<string>();
-        fileQueue = new Queue<string>();
+        Reset();
         fileQueue.Enqueue(filepath);
-
         compiledFiles.Add(filepath);
-
-        branchId = 1;
 
         while (fileQueue.Count > 0)
         {   
             lines = new Dictionary<int, DialogueLine>();
-            scene[branchId] = lines;
+            branchId ++;
             lineId = -1;
+            scene[branchId] = lines;
         
             foreach (var line in File.ReadLines(fileQueue.Dequeue()))
             {
@@ -105,41 +98,13 @@ public class ScriptCompiler
                                 break;
                         }
                         break;
-
-
-                    // case MainState.SettingLineData:
-                    
-                    //     break;
-                    // case State.SettingChoice:
-                    //     CreateChoice(trimmed);
-
-                    //     break;
-                    // case State.SettingChoiceText:
-                    //     SetText(trimmed);
-                    //     break;
-                    // case State.SettingChoiceData:
-                    //     SetData(trimmed);
-                    //     break;
                 }
-
-
             }
-
-            // if (!string.IsNullOrWhiteSpace(lineText))
-            // {
-            //     if (state == State.SettingText) 
-            //         scene[branchId][lineId].Text = lineText;
-            //     else if (state == State.SettingChoiceText)
-            //         scene[branchId][lineId].Choices[choiceId].Text = lineText;
-
-            //     lineText = "";
-            // }
-            
-            branchId ++;
         }
         string json = JsonSerializer.Serialize(scene, JsonContext.Default.DictionaryInt32DictionaryInt32DialogueLine);
         Console.WriteLine($"{outputPath}.json");
         File.WriteAllText($"scenes\\{outputPath}.json", json);
+
     }
 
     private void SetText(string line)
@@ -222,7 +187,7 @@ public class ScriptCompiler
             else
                 switchTarget = $"{compiledFiles.IndexOf(lineParameter)}:0";
 
-            if (mainState == MainState.SettingLineData)
+            if (blockState == BlockState.SettingMetadata)
                 scene[branchId][lineId].VNCoreData[lineFlag] = switchTarget;
             else if (blockState == BlockState.SettingChoiceData)
                 scene[branchId][lineId].Choices[choiceId].VNCoreData[lineFlag] = switchTarget;
@@ -233,7 +198,7 @@ public class ScriptCompiler
 
         if (isCoreData)
         {
-            if (mainState == MainState.SettingLineData)
+            if (blockState == BlockState.SettingMetadata)
             {
                 scene[branchId][lineId].VNCoreData[lineFlag] = lineParameter;
                 Console.WriteLine("LineData Set");
@@ -245,7 +210,7 @@ public class ScriptCompiler
             }
         } else
         {
-            if (mainState == MainState.SettingLineData)
+            if (blockState == BlockState.SettingMetadata)
             {
                 scene[branchId][lineId].Metadata[lineFlag] = lineParameter;
                 Console.WriteLine("LineData Set");
@@ -334,6 +299,7 @@ public class ScriptCompiler
                     return;
 
                 case 3:
+                Console.WriteLine("Choice Data detected");
                     blockState = BlockState.SettingChoiceData;
                     return;
             }
@@ -360,63 +326,24 @@ public class ScriptCompiler
         return count / 4;
     }
 
+    private void Reset()
+    {
+        scene = new Dictionary<int, Dictionary<int, DialogueLine>>();
+        fileQueue = new Queue<string>();
+        compiledFiles = new List<string>();
+
+        branchId = -1;
+        lineId = -1;
+        choiceId = 0;
+
+        lineText = "";
+        lineFlag = "";
+        lineParameter = "";
+
+        lines = new Dictionary<int, DialogueLine>();
+
+        mainState = MainState.None;
+        blockState = BlockState.None;
+    }
+
 }
-
-
-
-
-// Alice: 
-// "Hello."
-//     wait: 0.5
-//     autoAdvance: true
-//     expression: happy 
-//     voice: alice_hello.wav 
-//     animation: wave
-
-// Turns into
-
-// {
-//     "speaker": "Alice",
-//     "text": "Hello.",
-//
-//     "engine": {
-//         "wait": 0.5,
-//         "autoAdvance": true
-//     },
-//
-//     "metadata": {
-//         "expression": "happy",
-//         "voice": "alice_hello.wav",
-//         "animation": "wave",
-//     }
-// }
-
-
-//:
-//""
-//Choice:  
-//  "Do x"
-//      affinity: +1
-//  if: affinity=1, hate=1
-//      "choice 2 unlocks. when dialogue sees if, it checks condition using seperate function, probably need a condition check function in game to work properly
-//       if returns true, then reads the next tabbed line, otherwise it pretends they dont exist. for " it should treat multiple lines as the same type until the second " is found"
-// to make ^ easier, instead of adding ifs, might just make users duplicate the file and check in game conditions for which one is used.
-
-
-
-// 
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
