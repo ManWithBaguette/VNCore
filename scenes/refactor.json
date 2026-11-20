@@ -1,0 +1,33 @@
+{
+  "0": {
+    "0": {
+      "Speaker": "Speaker",
+      "Text": "$\u0022Text 2 moretext fstring{asd}",
+      "VNCoreData": {
+        "switch": "0:3",
+        "condition": " coredata test",
+        "precondition": " Capital coredata test"
+      },
+      "Metadata": {
+        "Misc": " metadata test",
+        "sdfa": " moretest"
+      },
+      "Choices": {
+        "1": {
+          "Text": "INLINE",
+          "VNCoreData": {},
+          "Metadata": {
+            "choicedata1": " testing"
+          }
+        },
+        "2": {
+          "Text": "outline",
+          "VNCoreData": {
+            "switch": "0:4"
+          },
+          "Metadata": {}
+        }
+      }
+    }
+  }
+}

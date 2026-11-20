@@ -1,0 +1,14 @@
+Speaker: Text 2
+moretext
+$"fstring{asd}
+    switch: 3
+    condition: coredata test
+    Misc: metadata test
+    PrecondItion: Capital coredata test
+    sdfa: moretest
+    choice:
+        choice-1: INLINE
+            choicedata1: testing
+        choice-2:
+        outline
+            switch: 4
