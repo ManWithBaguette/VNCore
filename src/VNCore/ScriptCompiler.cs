@@ -86,7 +86,7 @@ public class ScriptCompiler
                     switch (mainState)
                     {
                         case MainState.SettingSpeaker:
-                            SetSpeaker(trimmed);
+                            SetSpeaker();
                             Console.WriteLine("Speaker Set");
                             break;
 
@@ -98,19 +98,19 @@ public class ScriptCompiler
                             switch (blockState)
                             {
                                 case BlockState.SettingMetadata:
-                                    SetData(trimmed);
+                                    SetData();
                                     break;
                                 case BlockState.SettingChoice:
                                     choiceId = 0;
                                     break;
                                 case BlockState.AddingChoice:
-                                    AddChoice(trimmed);
+                                    AddChoice();
                                     break;
                                 case BlockState.SettingChoiceText:
                                     SetText(trimmed);
                                     break;
                                 case BlockState.SettingChoiceData:
-                                    SetData(trimmed);
+                                    SetData();
                                     break;
                             }
                             break;
@@ -166,7 +166,7 @@ public class ScriptCompiler
         );
     }
 
-    private void SetSpeaker(string line)
+    private void SetSpeaker()
     {
         lineId ++;
         lines[lineId] = new DialogueLine {Speaker = lineFlag.Trim()};
@@ -174,7 +174,7 @@ public class ScriptCompiler
         scene[branchId][lineId].Text = lineText;
     }
 
-    private void AddChoice(string line)
+    private void AddChoice()
     {
         choiceId ++;
         scene[branchId][lineId].Choices[choiceId] = new DialogueElement();
@@ -182,7 +182,7 @@ public class ScriptCompiler
         scene[branchId][lineId].Choices[choiceId].Text = lineText;
     }
 
-    private void SetData(string line)
+    private void SetData()
     {
         bool isCoreData = CoreDataFlags.Contains(lineFlag.ToLower());
         lineFlag = isCoreData ? lineFlag.ToLower() : lineFlag;
