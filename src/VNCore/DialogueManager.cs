@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using VNCore.Dialogue;
 
 namespace VNCore.DialogueManager;
@@ -25,7 +26,7 @@ public class DialogueManager
     private Dictionary<int, Dictionary<int, DialogueLine>> scene = new();
     private DialogueLine currentLine = new();
     public DialogueLine CurrentLine => currentLine;
-    private int currentBranch = 1;
+    private int currentBranch = 0;
     private int currentLineNum = 0;
 
     public State DialogueState { get; private set; }
@@ -87,14 +88,14 @@ public class DialogueManager
             return new DialogueResult(false, "Scene data is empty", DialogueError.InvalidScene);
         }
 
-        if (!loadedScene.TryGetValue(1, out var firstBranch) || firstBranch == null || !firstBranch.ContainsKey(0))
+        if (!loadedScene.TryGetValue(0, out var firstBranch) || firstBranch == null || !firstBranch.ContainsKey(0))
         {
-            return new DialogueResult(false, "Scene must contain branch 1 line 0", DialogueError.InvalidScene);
+            return new DialogueResult(false, "Scene must contain branch 0 line 0", DialogueError.InvalidScene);
         }
 
         scene = loadedScene;
 
-        currentBranch = 1;
+        currentBranch = 0;
         currentLineNum = 0;
         currentChoice = null;
         choices.Clear();
@@ -248,6 +249,11 @@ public class DialogueManager
 
             currentLine = line;
 
+            if (line.Text.StartsWith("$\""))
+            {
+                line.Text = ReplaceFString(line.Text);
+            }
+
             OnDialogueChanged?.Invoke(currentLine);
 
             if (currentLine.VNCoreData.TryGetValue("precondition", out var condition))
@@ -289,8 +295,30 @@ public class DialogueManager
             {
                 choiceNum++;
                 choices[choiceNum] = choice.Value;
+                if (choices[choiceNum].Text.StartsWith("$\""))
+                {
+                    choices[choiceNum].Text = ReplaceFString(choices[choiceNum].Text);
+                }
             }
         }
         
+    }
+
+    private string ReplaceFString(string fString)
+    {
+        if (saveData == null)
+        {
+            return fString;
+        }
+        string text = fString[2..];
+
+        return Regex.Replace(text, @"\{([^{}]+)\}", match =>
+        {
+            string variable = match.Groups[1].Value;
+            if (saveData.Data.TryGetValue(variable, out var value))
+                return value.ToString();
+
+            return match.Value;
+        });
     }
 }

@@ -1,10 +1,8 @@
 Speaker: Text 2
 moretext
 $"fstring{asd}
-    switch: 3
     condition: coredata test
     Misc: metadata test
-    PrecondItion: Capital coredata test
     sdfa: moretest
     choice:
         choice-1: INLINE
@@ -12,3 +10,10 @@ $"fstring{asd}
         choice-2:
         outline
             switch: 4
+
+Speaker2:
+fstring test variable x: 2
+    x: 2
+
+Speaker3"
+$"Check value of x: {x} and also {x}
