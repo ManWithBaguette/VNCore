@@ -2,7 +2,7 @@
   "0": {
     "0": {
       "Speaker": "Speaker",
-      "Text": "Text 2 moretext",
+      "Text": "$\u0022Text 2 moretext fstring{asd}",
       "VNCoreData": {
         "switch": "0:3",
         "condition": " coredata test",

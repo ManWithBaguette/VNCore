@@ -1,5 +1,6 @@
 Speaker: Text 2
 moretext
+$"fstring{asd}
     switch: 3
     condition: coredata test
     Misc: metadata test

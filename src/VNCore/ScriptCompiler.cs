@@ -41,6 +41,7 @@ public class ScriptCompiler
 
     private readonly List<String> CoreDataFlags = [
         "switch",
+        "switch-condition",
         "condition",
         "precondition",
         "postcondition",
@@ -109,6 +110,15 @@ public class ScriptCompiler
 
     private void SetText(string line)
     {
+        if (line.StartsWith("$\""))
+        {
+            if (!lineText.StartsWith("$\""))
+            {
+                lineText = "$\"" + lineText;
+            }
+            line = line[2..];
+        }
+
         lineText += (lineText.Length > 0 ? " " : "") + line;
         Console.WriteLine($"Text Added: {line}");
 
