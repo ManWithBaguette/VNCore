@@ -48,6 +48,8 @@ public class DialogueManager
 
     public DialogueElement? CurrentChoice => currentChoice;
 
+    public event Action? OnSceneLoaded;
+    public event Action? OnSceneUnloaded;
     public event Action<DialogueLine>? OnDialogueChanged;
     public event Action<IReadOnlyDictionary<int, DialogueElement>>? OnChoicesUpdated;
     public event Action? OnDialogueEnded;
@@ -119,18 +121,13 @@ public class DialogueManager
 
         try
         {
-            return UpdateLine();
+            DialogueResult result =  UpdateLine();
+            OnSceneLoaded?.Invoke();
+            return result;
         }
         catch (DialogueException ex)
         {
-            scene.Clear();
-            currentLine = new DialogueLine();
-            currentBranch = 0;
-            currentLineNum = 0;
-            choices.Clear();
-            currentChoice = null;
-            DialogueState = State.UNLOADED;
-
+            UnloadScene();
             return HandleException(ex);
         }
     }
@@ -400,6 +397,19 @@ public class DialogueManager
         {
             return HandleException(ex);
         }
+    }
+
+    public void UnloadScene()
+    {
+        scene.Clear();
+        currentLine = new DialogueLine();
+        currentBranch = 0;
+        currentLineNum = 0;
+        choices.Clear();
+        currentChoice = null;
+        DialogueState = State.UNLOADED;
+
+        OnSceneUnloaded?.Invoke();
     }
 
     private class DialogueException : Exception
