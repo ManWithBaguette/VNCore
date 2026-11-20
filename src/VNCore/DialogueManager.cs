@@ -6,17 +6,16 @@ namespace VNCore.DialogueManager;
 
 public enum State
 {
-    UNLOADED,
-    DIALOGUE,
-    CHOICE,
-    LAST,
-    END
+    Unloaded,
+    Dialogue,
+    Choice,
+    Last,
+    End
 }
 
 public enum DialogueError
 {
     None,
-
     FileNotFound,
     FileAccessDenied,
     FileReadError,
@@ -38,7 +37,7 @@ public class DialogueManager
     private int currentBranch = 0;
     private int currentLineNum = 0;
 
-    public State DialogueState { get; private set; } = State.UNLOADED;
+    public State DialogueState { get; private set; } = State.Unloaded;
 
     private Dictionary<int, DialogueElement> choices = new();
 
@@ -135,9 +134,9 @@ public class DialogueManager
 
     public DialogueResult SelectChoice(int num)
     {
-        if (DialogueState != State.CHOICE)
+        if (DialogueState != State.Choice)
         {
-            return new DialogueResult(false, "Cannot select choice outside CHOICE state", DialogueError.IllegalState);
+            return new DialogueResult(false, "Cannot select choice outside Choice state", DialogueError.IllegalState);
         }
 
         if (!choices.TryGetValue(num, out var choice))
@@ -151,7 +150,7 @@ public class DialogueManager
 
     public DialogueResult Advance()
     {
-        if (DialogueState == State.UNLOADED)
+        if (DialogueState == State.Unloaded)
         {
             return new DialogueResult(false, "No scene is currently loaded.", DialogueError.IllegalState);
         }
@@ -159,17 +158,17 @@ public class DialogueManager
         try {
             switch (DialogueState)
             {
-                case State.DIALOGUE:
+                case State.Dialogue:
                     return AdvanceDialogue();
 
-                case State.CHOICE:
+                case State.Choice:
                     return AdvanceChoice();
 
-                case State.LAST:
+                case State.Last:
                     EndDialogue();
                     return new DialogueResult(true);
 
-                case State.END:
+                case State.End:
                     return new DialogueResult(true);
 
                 default:
@@ -227,9 +226,9 @@ public class DialogueManager
 
     private void EndDialogue()
     {
-        if (DialogueState == State.LAST)
+        if (DialogueState == State.Last)
         {
-            DialogueState = State.END;
+            DialogueState = State.End;
             OnDialogueEnded?.Invoke();
         }
     }
@@ -276,7 +275,7 @@ public class DialogueManager
                 Console.WriteLine("End of Branch reached.");
                 currentChoice = null;
                 choices.Clear();
-                DialogueState = State.LAST;
+                DialogueState = State.Last;
 
                 OnChoicesUpdated?.Invoke(choices);
 
@@ -293,7 +292,7 @@ public class DialogueManager
 
             if (currentLine.VNCoreData.TryGetValue("precondition", out var condition))
             {
-                if (saveData == null || (saveData != null && !saveData.Compare(condition)))
+                if (saveData == null || !saveData.Compare(condition))
                 {
                     currentLineNum++;
                     continue;
@@ -308,7 +307,7 @@ public class DialogueManager
             OnDialogueChanged?.Invoke(currentLine);
 
             UpdateChoices();
-            DialogueState = choices.Count > 0 ? State.CHOICE : State.DIALOGUE;
+            DialogueState = choices.Count > 0 ? State.Choice : State.Dialogue;
 
             OnChoicesUpdated?.Invoke(Choices);
             return new DialogueResult(true);
@@ -412,8 +411,8 @@ public class DialogueManager
         currentLineNum = 0;
         choices.Clear();
         currentChoice = null;
-        DialogueState = State.UNLOADED;
-
+        DialogueState = State.Unloaded;
+        OnChoicesUpdated?.Invoke(Choices);
         OnSceneUnloaded?.Invoke();
     }
 
