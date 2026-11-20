@@ -61,62 +61,79 @@ public class ScriptCompiler
     public CompileResult Compile(string filepath, string outputPath)
     {
         Reset();
-        fileQueue.Enqueue(filepath);
-        compiledFiles.Add(filepath);
 
-        while (fileQueue.Count > 0)
-        {   
-            lines = new Dictionary<int, DialogueLine>();
-            branchId ++;
-            lineId = -1;
-            scene[branchId] = lines;
-        
-            foreach (var line in File.ReadLines(fileQueue.Dequeue()))
-            {
-                int indentation = GetIndentation(line);
-                string trimmed = line.Trim();
+        try
+        {
+            
+            fileQueue.Enqueue(filepath);
+            compiledFiles.Add(filepath);
 
-                UpdateMainState(trimmed, indentation);
-
-
-                switch (mainState)
+            while (fileQueue.Count > 0)
+            {   
+                lines = new Dictionary<int, DialogueLine>();
+                branchId ++;
+                lineId = -1;
+                scene[branchId] = lines;
+            
+                foreach (var line in File.ReadLines(fileQueue.Dequeue()))
                 {
-                    case MainState.SettingSpeaker:
-                        SetSpeaker(trimmed);
-                        Console.WriteLine("Speaker Set");
-                        break;
+                    int indentation = GetIndentation(line);
+                    string trimmed = line.Trim();
 
-                    case MainState.SettingText: 
-                        SetText(trimmed);
-                        break;
+                    UpdateMainState(trimmed, indentation);
 
-                    case MainState.SettingLineData:
-                        switch (blockState)
-                        {
-                            case BlockState.SettingMetadata:
-                                SetData(trimmed);
-                                break;
-                            case BlockState.SettingChoice:
-                                choiceId = 0;
-                                break;
-                            case BlockState.AddingChoice:
-                                AddChoice(trimmed);
-                                break;
-                            case BlockState.SettingChoiceText:
-                                SetText(trimmed);
-                                break;
-                            case BlockState.SettingChoiceData:
-                                SetData(trimmed);
-                                break;
-                        }
-                        break;
+
+                    switch (mainState)
+                    {
+                        case MainState.SettingSpeaker:
+                            SetSpeaker(trimmed);
+                            Console.WriteLine("Speaker Set");
+                            break;
+
+                        case MainState.SettingText: 
+                            SetText(trimmed);
+                            break;
+
+                        case MainState.SettingLineData:
+                            switch (blockState)
+                            {
+                                case BlockState.SettingMetadata:
+                                    SetData(trimmed);
+                                    break;
+                                case BlockState.SettingChoice:
+                                    choiceId = 0;
+                                    break;
+                                case BlockState.AddingChoice:
+                                    AddChoice(trimmed);
+                                    break;
+                                case BlockState.SettingChoiceText:
+                                    SetText(trimmed);
+                                    break;
+                                case BlockState.SettingChoiceData:
+                                    SetData(trimmed);
+                                    break;
+                            }
+                            break;
+                    }
                 }
             }
+            string json = JsonSerializer.Serialize(scene, JsonContext.Default.DictionaryInt32DictionaryInt32DialogueLine);
+            Console.WriteLine($"{outputPath}.json");
+            File.WriteAllText($"scenes\\{outputPath}.json", json);
+            return new CompileResult(true);
         }
-        string json = JsonSerializer.Serialize(scene, JsonContext.Default.DictionaryInt32DictionaryInt32DialogueLine);
-        Console.WriteLine($"{outputPath}.json");
-        File.WriteAllText($"scenes\\{outputPath}.json", json);
-        return new CompileResult(true);
+        catch (ScriptCompileException ex)
+        {
+            return new CompileResult(false, ex.Message, ex.Error);
+        }
+        catch (IOException ex)
+        {
+            return new CompileResult(false, $"File I/O error: {ex.Message}");
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return new CompileResult(false, $"File access error: {ex.Message}");
+        }
     }
 
     private void SetText(string line)
