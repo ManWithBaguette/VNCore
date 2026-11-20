@@ -6,6 +6,7 @@ namespace VNCore.DialogueManager;
 
 public enum State
 {
+    UNLOADED,
     DIALOGUE,
     CHOICE,
     LAST,
@@ -15,10 +16,17 @@ public enum State
 public enum DialogueError
 {
     None,
+
     FileNotFound,
+    FileAccessDenied,
+    FileReadError,
+    InvalidJson,
+    
     InvalidScene,
     InvalidDestination,
-    IllegalState
+    
+    IllegalState,
+    InvalidChoice
 }
 
 public class DialogueManager
@@ -30,7 +38,7 @@ public class DialogueManager
     private int currentBranch = 0;
     private int currentLineNum = 0;
 
-    public State DialogueState { get; private set; }
+    public State DialogueState { get; private set; } = State.UNLOADED;
 
     private Dictionary<int, DialogueElement> choices = new();
 
@@ -47,7 +55,9 @@ public class DialogueManager
     public record DialogueResult(
         bool Success,
         string? ErrorMessage = null,
-        DialogueError? Error = DialogueError.None
+        DialogueError? Error = DialogueError.None,
+        int? Branch = null,
+        int? Line = null
     );
 
     public DialogueManager() {}
@@ -71,61 +81,72 @@ public class DialogueManager
             string jsonContent = File.ReadAllText(path);
             loadedScene = JsonSerializer.Deserialize<Dictionary<int, Dictionary<int, DialogueLine>>>(jsonContent);
 
-            if (scene == null)
-            {
-                throw new DialogueException(DialogueError.InvalidScene, "Scene data is empty");
-            }
-
-            ValidateScene(loadedScene);
-
-            if (!loadedScene.TryGetValue(0, out var firstBranch) || firstBranch == null || !firstBranch.ContainsKey(0))
-            {
-                throw new DialogueException(DialogueError.InvalidScene, "Scene must contain branch 0 line 0");
-            }
 
         }
-        catch (DialogueException ex)
+        catch (FileNotFoundException ex)
         {
-            return HandleException(ex);
+            return new DialogueResult(false, $"File not found: {ex.Message}", DialogueError.FileNotFound);
+        }
+        catch (DirectoryNotFoundException ex)
+        {
+            return new DialogueResult(false, $"Directory not found: {ex.Message}", DialogueError.FileNotFound);
         }
         catch (IOException ex)
         {
-            return new DialogueResult(false, $"File error: {ex.Message}");
+            return new DialogueResult(false, $"File error: {ex.Message}", DialogueError.FileReadError);
         }
         catch (UnauthorizedAccessException ex)
         {
-            return new DialogueResult(false, $"Access error: {ex.Message}");
+            return new DialogueResult(false, $"Access error: {ex.Message}", DialogueError.FileAccessDenied);
         }
         catch (JsonException ex)
         {
-            return new DialogueResult(false, $"Invalid JSON: {ex.Message}");
+            return new DialogueResult(false, $"Invalid JSON: {ex.Message}", DialogueError.InvalidJson);
         }
 
+        DialogueResult validation =  ValidateScene(loadedScene);
+        if (!validation.Success)
+        {
+            return validation;
+        }
 
-
-        scene = loadedScene;
+        scene = loadedScene!;
 
         currentBranch = 0;
         currentLineNum = 0;
         currentChoice = null;
         choices.Clear();
 
-        UpdateLine();
-        return new DialogueResult(true);
+        try
+        {
+            return UpdateLine();
+        }
+        catch (DialogueException ex)
+        {
+            scene.Clear();
+            currentLine = new DialogueLine();
+            currentBranch = 0;
+            currentLineNum = 0;
+            choices.Clear();
+            currentChoice = null;
+            DialogueState = State.UNLOADED;
+
+            return HandleException(ex);
+        }
     }
 
     public DialogueResult SelectChoice(int num)
     {
         if (DialogueState != State.CHOICE)
         {
-            return new DialogueResult(false, "Cannot select choice outside CHOICE state");
+            return new DialogueResult(false, "Cannot select choice outside CHOICE state", DialogueError.IllegalState);
         }
 
         if (!choices.TryGetValue(num, out var choice))
         {
             Console.WriteLine("Invalid Choice Selection");
             currentChoice = null;
-            return new DialogueResult(false, $"Choice {num} is unavailable");
+            return new DialogueResult(false, $"Choice {num} is unavailable", DialogueError.InvalidChoice);
         }
         currentChoice = choice;
         return new DialogueResult(true);
@@ -133,6 +154,11 @@ public class DialogueManager
 
     public DialogueResult Advance()
     {
+        if (DialogueState == State.UNLOADED)
+        {
+            return new DialogueResult(false, "No scene is currently loaded.", DialogueError.IllegalState);
+        }
+
         try {
             switch (DialogueState)
             {
@@ -184,7 +210,7 @@ public class DialogueManager
     {
         if (currentChoice == null)
         {
-            return new DialogueResult(false, "Cannot advance: no choice has been selected");
+            return new DialogueResult(false, "Cannot advance: no choice has been selected", DialogueError.IllegalState);
         }
 
         DialogueElement selectedChoice = currentChoice;
@@ -246,8 +272,7 @@ public class DialogueManager
         {
             if (!scene.TryGetValue(currentBranch, out var branch))
             {
-                Console.WriteLine("Branch change invalid");
-                return new DialogueResult(false, $"Branch {currentBranch} does not exist");
+                throw new DialogueException(DialogueError.InvalidScene, $"Branch {currentBranch} does not exist", currentBranch, currentLineNum);
             }
             if (!branch.TryGetValue(currentLineNum, out var line))
             {
@@ -260,7 +285,7 @@ public class DialogueManager
 
             if (line == null)
             {
-                return new DialogueResult(false, $"Line {currentLineNum} in branch {currentBranch} is null");
+                throw new DialogueException(DialogueError.InvalidScene, $"Line {currentLineNum} in branch {currentBranch} is null", currentBranch, currentLineNum);
             }
 
             currentLine = line;
@@ -338,20 +363,22 @@ public class DialogueManager
         });
     }
 
-    public DialogueResult ValidateScene(Dictionary<int, Dictionary<int, DialogueLine>> scene)
+    public DialogueResult ValidateScene(Dictionary<int, Dictionary<int, DialogueLine>>? scene)
     {
 
         try
         {
+            
             if (scene == null)
             {
                 throw new DialogueException(DialogueError.InvalidScene, "Scene data is empty");
             }
             
-            if (!scene.ContainsKey(0))
+            if (!scene.TryGetValue(0, out var firstBranch) || firstBranch == null || !firstBranch.ContainsKey(0))
             {
-                throw new DialogueException(DialogueError.InvalidScene, "Missing initial branch 0");
+                throw new DialogueException(DialogueError.InvalidScene, "Scene must contain branch 0 line 0");
             }
+
             foreach (var branch in scene)
             {
                 if (branch.Value == null)
@@ -390,6 +417,6 @@ public class DialogueManager
 
     private DialogueResult HandleException(DialogueException ex)
     {
-        return new DialogueResult(false, ex.Message, ex.Error);
+        return new DialogueResult(false, ex.Message, ex.Error, ex.CurrentBranch >= 0 ? ex.CurrentBranch : null, ex.CurrentLine >= 0 ? ex.CurrentLine : null);
     }
 }
