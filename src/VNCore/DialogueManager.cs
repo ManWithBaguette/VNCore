@@ -18,6 +18,7 @@ public enum DialogueError
     FileNotFound,
     InvalidScene,
     InvalidDestination,
+    IllegalState
 }
 
 public class DialogueManager
@@ -69,6 +70,23 @@ public class DialogueManager
         {
             string jsonContent = File.ReadAllText(path);
             loadedScene = JsonSerializer.Deserialize<Dictionary<int, Dictionary<int, DialogueLine>>>(jsonContent);
+
+            if (scene == null)
+            {
+                throw new DialogueException(DialogueError.InvalidScene, "Scene data is empty");
+            }
+
+            ValidateScene(loadedScene);
+
+            if (!loadedScene.TryGetValue(0, out var firstBranch) || firstBranch == null || !firstBranch.ContainsKey(0))
+            {
+                throw new DialogueException(DialogueError.InvalidScene, "Scene must contain branch 0 line 0");
+            }
+
+        }
+        catch (DialogueException ex)
+        {
+            return HandleException(ex);
         }
         catch (IOException ex)
         {
@@ -82,16 +100,8 @@ public class DialogueManager
         {
             return new DialogueResult(false, $"Invalid JSON: {ex.Message}");
         }
-        
-        if (loadedScene == null)
-        {
-            return new DialogueResult(false, "Scene data is empty", DialogueError.InvalidScene);
-        }
 
-        if (!loadedScene.TryGetValue(0, out var firstBranch) || firstBranch == null || !firstBranch.ContainsKey(0))
-        {
-            return new DialogueResult(false, "Scene must contain branch 0 line 0", DialogueError.InvalidScene);
-        }
+
 
         scene = loadedScene;
 
@@ -115,30 +125,37 @@ public class DialogueManager
         {
             Console.WriteLine("Invalid Choice Selection");
             currentChoice = null;
-            return new DialogueResult(false, "Choice {num} is unavailable");
+            return new DialogueResult(false, $"Choice {num} is unavailable");
         }
         currentChoice = choice;
         return new DialogueResult(true);
     }
 
-    public void Advance()
+    public DialogueResult Advance()
     {
-        switch (DialogueState)
+        try {
+            switch (DialogueState)
+            {
+                case State.DIALOGUE:
+                    return AdvanceDialogue();
+
+                case State.CHOICE:
+                    return AdvanceChoice();
+
+                case State.LAST:
+                    EndDialogue();
+                    return new DialogueResult(true);
+
+                case State.END:
+                    return new DialogueResult(true);
+
+                default:
+                    throw new DialogueException(DialogueError.IllegalState, "Current Dialogue Manager state is illegal");
+            }
+        }
+        catch (DialogueException ex)
         {
-            case State.DIALOGUE:
-                AdvanceDialogue();
-                break;
-
-            case State.CHOICE:
-                AdvanceChoice();
-                break;
-
-            case State.LAST:
-                EndDialogue();
-                break;
-
-            case State.END:
-                break;
+            return HandleException(ex);
         }
     }
 
@@ -198,29 +215,28 @@ public class DialogueManager
     {
         if (string.IsNullOrWhiteSpace(destination))
         {
-            return new DialogueResult(false, "Switch destination is empty", DialogueError.InvalidDestination);
+            throw new DialogueException(DialogueError.InvalidDestination, "Switch destination is empty", currentBranch, currentLineNum);
         }
 
         string[] parts = destination.Split(':');
         if (parts.Length != 2 || !int.TryParse(parts[0], out int branch) || !int.TryParse(parts[1], out int line))
         {
-            return new DialogueResult(false, $"Invalid switch destination: {destination}", DialogueError.InvalidDestination);
+            throw new DialogueException(DialogueError.InvalidDestination, $"Invalid switch destination: {destination}", currentBranch, currentLineNum);
         }
 
         if (!scene.TryGetValue(branch, out var branchData))
         {
-            return new DialogueResult(false, $"Branch {branch} does not exist", DialogueError.InvalidDestination);
+            throw new DialogueException(DialogueError.InvalidDestination, $"Branch {branch} does not exist", currentBranch, currentLineNum);
         }
 
         if (!branchData.ContainsKey(line))
         {
-            return new DialogueResult(false, $"Line {line} does not exist in branch {branch}", DialogueError.InvalidDestination);
+            throw new DialogueException(DialogueError.InvalidDestination, $"Line {line} does not exist in branch {branch}", currentBranch, currentLineNum);
         }
 
-        Console.WriteLine($"Switch Destination: {destination}");
-        Console.WriteLine($"Branch: {branch}, Line: {line}");
         currentBranch = branch;
         currentLineNum = line;
+
         return UpdateLine();
     }
 
@@ -320,5 +336,60 @@ public class DialogueManager
 
             return match.Value;
         });
+    }
+
+    public DialogueResult ValidateScene(Dictionary<int, Dictionary<int, DialogueLine>> scene)
+    {
+
+        try
+        {
+            if (scene == null)
+            {
+                throw new DialogueException(DialogueError.InvalidScene, "Scene data is empty");
+            }
+            
+            if (!scene.ContainsKey(0))
+            {
+                throw new DialogueException(DialogueError.InvalidScene, "Missing initial branch 0");
+            }
+            foreach (var branch in scene)
+            {
+                if (branch.Value == null)
+                {
+                    throw new DialogueException(DialogueError.InvalidScene, $"Branch {branch.Key} is null", branch.Key);
+                }
+
+                foreach (var line in branch.Value)
+                {
+                    if (line.Value == null)
+                    {
+                        throw new DialogueException(DialogueError.InvalidScene, $"Line {line.Key} in branch {branch.Key} is null", branch.Key, line.Key);
+                    }
+                }
+            }
+            return new DialogueResult(true);
+        }
+        catch(DialogueException ex)
+        {
+            return HandleException(ex);
+        }
+    }
+
+    private class DialogueException : Exception
+    {
+        public DialogueError Error { get; }
+        public int CurrentBranch { get ; }
+        public int CurrentLine { get ; }
+        public DialogueException(DialogueError error, string message, int currentBranch = -1, int currentLine = -1) : base(message)
+        {
+            Error = error;
+            CurrentBranch = currentBranch;
+            CurrentLine = currentLine;
+        }
+    }
+
+    private DialogueResult HandleException(DialogueException ex)
+    {
+        return new DialogueResult(false, ex.Message, ex.Error);
     }
 }

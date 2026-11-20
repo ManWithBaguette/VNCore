@@ -13,11 +13,17 @@ var saveManager = new SaveManager();
 saveManager.LoadSave("");
 var dialogueManager = new DialogueManager(saveManager.Current);
 // var dialogueManager = new DialogueManager();
-dialogueManager.LoadScene("scenes/refactor.json");
+DialogueManager.DialogueResult result = dialogueManager.LoadScene("scenes/refactor.json");
 while (dialogueManager.DialogueState != State.END) //Test code. Later probably simplify use of the dialogue manager.
 {
     if (dialogueManager.DialogueState != State.LAST)
     {
+        if (!result.Success)
+        {
+            Console.WriteLine(result.ErrorMessage);
+            Console.WriteLine($"Error: {result.Error}");
+        }
+
         choice = 0;
         
         Console.WriteLine($"Speaker: {dialogueManager.CurrentLine.Speaker}\nLine: {dialogueManager.CurrentLine.Text}\n");
