@@ -86,7 +86,7 @@ public class ScriptCompiler
                         break;
                     
                     case MainState.SettingLineData:
-                        // SetData(trimmed);
+                        SetData(trimmed);
                         break;
 
                     // case MainState.SettingLineData:
@@ -171,105 +171,86 @@ public class ScriptCompiler
         }
         blockState = BlockState.SettingChoiceText;
     }
-    // private void SetData(string line)
-    // {
-    //     if (string.IsNullOrWhiteSpace(line))
-    //     {
-    //         state = State.SettingSpeaker;
-    //         return;
-    //     }
 
-    //     int colonIndex = line.IndexOf(':');
-    //     string flag = line[..colonIndex].Trim();
-    //     string parameter = line[(colonIndex + 1)..].Trim();
+    private void SetData(string line)
+    {
+        bool isCoreData = CoreDataFlags.Contains(lineFlag.ToLower());
+        lineFlag = isCoreData ? lineFlag.ToLower() : lineFlag;
         
-    //     bool isCoreData = CoreDataFlags.Contains(flag.ToLower());
+        if (lineFlag == "switch")
+        {
+            string switchTarget;
 
+            if (int.TryParse(lineParameter, out int value))
+            {
+                switchTarget = $"0:{value}";
+            }
+            else if (lineParameter.Contains(':'))
+            {
+                Dictionary<string, string> switchParameters = new();
+                string[] parts = lineParameter.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (string part in parts)
+                {
+                    string[] keyValue = part.Split(':', 2);
+                    switchParameters[keyValue[0]] = keyValue[1];
+                }
+
+                if (switchParameters.TryGetValue("path", out string? target))
+                {
+                    if (!compiledFiles.Contains(target))
+                    {
+                        fileQueue.Enqueue(target);
+                        compiledFiles.Add(target);
+                    }
+                    switchTarget = compiledFiles.IndexOf(target).ToString();
+                } else
+                    switchTarget = branchId.ToString();
+
+                if (switchParameters.TryGetValue("line", out string? lineValue))
+                {
+                    switchTarget = $"{switchTarget}:{lineValue}";
+                }
+            }
+            else
+                switchTarget = $"{compiledFiles.IndexOf(lineParameter)}:0";
+
+            if (mainState == MainState.SettingLineData)
+                scene[branchId][lineId].VNCoreData[lineFlag] = switchTarget;
+            else if (blockState == BlockState.SettingChoiceData)
+                scene[branchId][lineId].Choices[choiceId].VNCoreData[lineFlag] = switchTarget;
+
+            Console.WriteLine("Switch flag set");
+            return;
+        }
+
+        if (isCoreData)
+        {
+            if (mainState == MainState.SettingLineData)
+            {
+                scene[branchId][lineId].VNCoreData[lineFlag] = lineParameter;
+                Console.WriteLine("LineData Set");
+            }
+            else if (blockState == BlockState.SettingChoiceData)
+            {
+                scene[branchId][lineId].Choices[choiceId].VNCoreData[lineFlag] = lineParameter;
+                Console.WriteLine("ChoiceData Set");
+            }
+        } else
+        {
+            if (mainState == MainState.SettingLineData)
+            {
+                scene[branchId][lineId].Metadata[lineFlag] = lineParameter;
+                Console.WriteLine("LineData Set");
+            }
+            else if (blockState == BlockState.SettingChoiceData)
+            {
+                scene[branchId][lineId].Choices[choiceId].Metadata[lineFlag] = lineParameter;
+                Console.WriteLine("ChoiceData Set");
+            }
+        }
         
-    //     if (flag == "switch")
-    //     {
-
-    //         string switchTarget;
-
-    //         if (int.TryParse(parameter, out int value))
-    //         {
-    //             switchTarget = $"0:{value}";
-    //         }
-    //         else if (parameter.Contains(':'))
-    //         {
-    //             Dictionary<string, string> switchParameters = new();
-    //             string[] parts = parameter.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-    //             foreach (string part in parts)
-    //             {
-    //                 string[] keyValue = part.Split(':', 2);
-    //                 switchParameters[keyValue[0]] = keyValue[1];
-    //             }
-
-    //             if (switchParameters.TryGetValue("path", out string? target))
-    //             {
-    //                 if (!compiledFiles.Contains(target))
-    //                 {
-    //                     fileQueue.Enqueue(target);
-    //                     compiledFiles.Add(target);
-    //                 }
-    //                 switchTarget = compiledFiles.IndexOf(target).ToString();
-    //             } else
-    //                 switchTarget = branchId.ToString();
-
-    //             if (switchParameters.TryGetValue("line", out string? lineValue))
-    //             {
-    //                 switchTarget = $"{switchTarget}:{lineValue}";
-    //             }
-    //         }
-    //         else
-    //             switchTarget = $"{compiledFiles.IndexOf(parameter)}:0";
-
-    //         if (state == State.SettingLineData)
-    //             scene[branchId][lineId].VNCoreData[flag] = switchTarget;
-    //         else if (state == State.SettingChoiceData)
-    //             scene[branchId][lineId].Choices[choiceId].VNCoreData[flag] = switchTarget;
-
-    //         Console.WriteLine("Switch flag set");
-    //         return;
-
-    //     } else if (flag == "choice" && state == State.SettingLineData) {
-    //         state = State.SettingChoice;
-    //     } else if (int.TryParse(flag, out int value) && state == State.SettingChoiceData)
-    //     {
-    //         choiceId ++;
-    //         scene[branchId][lineId].Choices[choiceId] = new DialogueElement();
-    //         lineText = parameter;
-    //         state = State.SettingChoiceText;
-    //     }
-
-    //     if (isCoreData)
-    //     {
-    //         if (state == State.SettingLineData)
-    //         {
-    //             scene[branchId][lineId].VNCoreData[flag] = parameter;
-    //             Console.WriteLine("LineData Set");
-    //         }
-    //         else if (state == State.SettingChoiceData)
-    //         {
-    //             scene[branchId][lineId].Choices[choiceId].VNCoreData[flag] = parameter;
-    //             Console.WriteLine("ChoiceData Set");
-    //         }
-    //     } else
-    //     {
-    //         if (state == State.SettingLineData)
-    //         {
-    //             scene[branchId][lineId].Metadata[flag] = parameter;
-    //             Console.WriteLine("LineData Set");
-    //         }
-    //         else if (state == State.SettingChoiceData)
-    //         {
-    //             scene[branchId][lineId].Choices[choiceId].Metadata[flag] = parameter;
-    //             Console.WriteLine("ChoiceData Set");
-    //         }
-    //     }
-
-    // }
+    }
 
     private void UpdateMainState(string line, int indentation)
     {

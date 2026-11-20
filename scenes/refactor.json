@@ -2,9 +2,15 @@
   "1": {
     "0": {
       "Speaker": "Speaker",
-      "Text": "Text moretext",
-      "VNCoreData": {},
-      "Metadata": {},
+      "Text": "Text 2 moretext",
+      "VNCoreData": {
+        "switch": "0:3",
+        "condition": " coredata test",
+        "precondition": " Capital coredata test"
+      },
+      "Metadata": {
+        "Misc": " metadata test"
+      },
       "Choices": {}
     }
   }

@@ -1,2 +1,6 @@
-Speaker: Text
+Speaker: Text 2
 moretext
+    switch: 3
+    condition: coredata test
+    Misc: metadata test
+    PrecondItion: Capital coredata test
