@@ -84,10 +84,28 @@ public class ScriptCompiler
                     case MainState.SettingText: 
                         SetText(trimmed);
                         break;
-                    
+
                     case MainState.SettingLineData:
-                        SetData(trimmed);
+                        switch (blockState)
+                        {
+                            case BlockState.SettingMetadata:
+                                SetData(trimmed);
+                                break;
+                            case BlockState.SettingChoice:
+                                choiceId = 0;
+                                break;
+                            case BlockState.AddingChoice:
+                                AddChoice(trimmed);
+                                break;
+                            case BlockState.SettingChoiceText:
+                                SetText(trimmed);
+                                break;
+                            case BlockState.SettingChoiceData:
+                                SetData(trimmed);
+                                break;
+                        }
                         break;
+
 
                     // case MainState.SettingLineData:
                     
@@ -104,15 +122,6 @@ public class ScriptCompiler
                     //     break;
                 }
 
-                if (mainState == MainState.SettingLineData)
-                {
-                    switch (blockState)
-                    {
-                        case BlockState.SettingMetadata:
-                            break;
-                    }
-                }
-                
 
             }
 
@@ -159,17 +168,15 @@ public class ScriptCompiler
         lineId ++;
         lines[lineId] = new DialogueLine {Speaker = lineFlag.Trim()};
         lineText = lineParameter.Trim();
+        scene[branchId][lineId].Text = lineText;
     }
 
-    private void CreateChoice(string line)
+    private void AddChoice(string line)
     {
-        choiceId = 1;
+        choiceId ++;
         scene[branchId][lineId].Choices[choiceId] = new DialogueElement();
-        if (!string.IsNullOrWhiteSpace(line))
-        {
-            lineText = line.Contains(':') ? line[(line.IndexOf(':') + 1)..].Trim() : line;
-        }
-        blockState = BlockState.SettingChoiceText;
+        lineText = lineParameter.Trim();
+        scene[branchId][lineId].Choices[choiceId].Text = lineText;
     }
 
     private void SetData(string line)

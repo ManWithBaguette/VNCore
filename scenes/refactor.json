@@ -4,14 +4,27 @@
       "Speaker": "Speaker",
       "Text": "Text 2 moretext",
       "VNCoreData": {
-        "switch": "0:3",
+        "switch": "0:4",
         "condition": " coredata test",
         "precondition": " Capital coredata test"
       },
       "Metadata": {
-        "Misc": " metadata test"
+        "Misc": " metadata test",
+        "sdfa": " moretest",
+        "choicedata1": " testing"
       },
-      "Choices": {}
+      "Choices": {
+        "1": {
+          "Text": "INLINE",
+          "VNCoreData": {},
+          "Metadata": {}
+        },
+        "2": {
+          "Text": "outline",
+          "VNCoreData": {},
+          "Metadata": {}
+        }
+      }
     }
   }
 }
