@@ -21,6 +21,11 @@ enum BlockState
     SettingChoiceData
 }
 
+public enum CompileError
+{
+    None,
+
+}
 public class ScriptCompiler
 {
     private Dictionary<int, Dictionary<int, DialogueLine>> scene = [];
@@ -47,7 +52,13 @@ public class ScriptCompiler
         "postcondition",
     ];
 
-    public void Compile(string filepath, string outputPath)
+    public record CompileResult (
+        bool Success,
+        string? ErrorMessage = null,
+        CompileError? Error = CompileError.None
+    );
+
+    public CompileResult Compile(string filepath, string outputPath)
     {
         Reset();
         fileQueue.Enqueue(filepath);
@@ -105,7 +116,7 @@ public class ScriptCompiler
         string json = JsonSerializer.Serialize(scene, JsonContext.Default.DictionaryInt32DictionaryInt32DialogueLine);
         Console.WriteLine($"{outputPath}.json");
         File.WriteAllText($"scenes\\{outputPath}.json", json);
-
+        return new CompileResult(true);
     }
 
     private void SetText(string line)
@@ -356,4 +367,14 @@ public class ScriptCompiler
         blockState = BlockState.None;
     }
 
+    private class ScriptCompileException : Exception
+    {
+        public CompileError Error { get; }
+        private string currentFile = "";
+        private int currentLine;
+        public ScriptCompileException(CompileError error, string message) : base(message)
+        {
+            Error = error;
+        }
+    }
 }
