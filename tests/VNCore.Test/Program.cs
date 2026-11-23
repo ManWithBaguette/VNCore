@@ -14,9 +14,9 @@ saveManager.LoadSave("");
 var dialogueManager = new DialogueManager(saveManager.Current);
 // var dialogueManager = new DialogueManager();
 DialogueManager.DialogueResult result = dialogueManager.LoadScene("scenes/refactor.json");
-while (dialogueManager.DialogueState != State.END) //Test code. Later probably simplify use of the dialogue manager.
+while (dialogueManager.DialogueState != State.End) //Test code. Later probably simplify use of the dialogue manager.
 {
-    if (dialogueManager.DialogueState != State.LAST)
+    if (dialogueManager.DialogueState != State.Last)
     {
         if (!result.Success)
         {

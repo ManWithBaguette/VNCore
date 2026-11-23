@@ -347,7 +347,7 @@ public class DialogueManager
 
     private string ReplaceFString(string fString)
     {
-        string text = fString[2..^1];
+        string text = fString[2..];
 
         if (saveData == null)
         {
