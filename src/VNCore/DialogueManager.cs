@@ -34,8 +34,8 @@ public class DialogueManager
     private Dictionary<int, Dictionary<int, DialogueLine>> scene = new();
     private DialogueLine currentLine = new();
     public DialogueLine CurrentLine => currentLine;
-    private int currentBranch = 0;
-    private int currentLineNum = 0;
+    public int CurrentBranch { get; private set; } = 0;
+    public int CurrentLineNum { get; private set; } = 0;
 
     public State DialogueState { get; private set; } = State.Unloaded;
 
@@ -81,6 +81,10 @@ public class DialogueManager
 
         try
         {
+            if (!path.ToLower().EndsWith(".json"))
+            {
+                path = path += ".json";
+            }
             string jsonContent = File.ReadAllText(path);
             loadedScene = JsonSerializer.Deserialize<Dictionary<int, Dictionary<int, DialogueLine>>>(jsonContent);
 
@@ -183,7 +187,7 @@ public class DialogueManager
 
     private DialogueResult MoveToNextLine()
     {
-        currentLineNum++;
+        CurrentLineNum++;
         return UpdateLine();
     }
 
@@ -218,7 +222,6 @@ public class DialogueManager
         }
         if (selectedChoice.VNCoreData.TryGetValue("switch", out string? destination))
         {
-            Console.WriteLine("Switch on Choice");
             return Switch(destination);
         }
         return MoveToNextLine();
@@ -237,27 +240,27 @@ public class DialogueManager
     {
         if (string.IsNullOrWhiteSpace(destination))
         {
-            throw new DialogueException(DialogueError.InvalidDestination, "Switch destination is empty", currentBranch, currentLineNum);
+            throw new DialogueException(DialogueError.InvalidDestination, "Switch destination is empty", CurrentBranch, CurrentLineNum);
         }
 
         string[] parts = destination.Split(':');
         if (parts.Length != 2 || !int.TryParse(parts[0], out int branch) || !int.TryParse(parts[1], out int line))
         {
-            throw new DialogueException(DialogueError.InvalidDestination, $"Invalid switch destination: {destination}", currentBranch, currentLineNum);
+            throw new DialogueException(DialogueError.InvalidDestination, $"Invalid switch destination: {destination}", CurrentBranch, CurrentLineNum);
         }
 
         if (!scene.TryGetValue(branch, out var branchData))
         {
-            throw new DialogueException(DialogueError.InvalidDestination, $"Branch {branch} does not exist", currentBranch, currentLineNum);
+            throw new DialogueException(DialogueError.InvalidDestination, $"Branch {branch} does not exist", CurrentBranch, CurrentLineNum);
         }
 
         if (!branchData.ContainsKey(line))
         {
-            throw new DialogueException(DialogueError.InvalidDestination, $"Line {line} does not exist in branch {branch}", currentBranch, currentLineNum);
+            throw new DialogueException(DialogueError.InvalidDestination, $"Line {line} does not exist in branch {branch}", CurrentBranch, CurrentLineNum);
         }
 
-        currentBranch = branch;
-        currentLineNum = line;
+        CurrentBranch = branch;
+        CurrentLineNum = line;
 
         return UpdateLine();
     }
@@ -266,11 +269,11 @@ public class DialogueManager
     {
         while (true)
         {
-            if (!scene.TryGetValue(currentBranch, out var branch))
+            if (!scene.TryGetValue(CurrentBranch, out var branch))
             {
-                throw new DialogueException(DialogueError.InvalidScene, $"Branch {currentBranch} does not exist", currentBranch, currentLineNum);
+                throw new DialogueException(DialogueError.InvalidScene, $"Branch {CurrentBranch} does not exist", CurrentBranch, CurrentLineNum);
             }
-            if (!branch.TryGetValue(currentLineNum, out var line))
+            if (!branch.TryGetValue(CurrentLineNum, out var line))
             {
                 Console.WriteLine("End of Branch reached.");
                 currentChoice = null;
@@ -284,7 +287,7 @@ public class DialogueManager
 
             if (line == null)
             {
-                throw new DialogueException(DialogueError.InvalidScene, $"Line {currentLineNum} in branch {currentBranch} is null", currentBranch, currentLineNum);
+                throw new DialogueException(DialogueError.InvalidScene, $"Line {CurrentLineNum} in branch {CurrentBranch} is null", CurrentBranch, CurrentLineNum);
             }
 
             currentLine = new DialogueLine(line);
@@ -294,7 +297,7 @@ public class DialogueManager
             {
                 if (saveData == null || !saveData.Compare(condition))
                 {
-                    currentLineNum++;
+                    CurrentLineNum++;
                     continue;
                 } 
             }
@@ -347,7 +350,7 @@ public class DialogueManager
 
     private string ReplaceFString(string fString)
     {
-        string text = fString[2..^1];
+        string text = fString[2..];
 
         if (saveData == null)
         {
@@ -407,8 +410,8 @@ public class DialogueManager
     {
         scene.Clear();
         currentLine = new DialogueLine();
-        currentBranch = 0;
-        currentLineNum = 0;
+        CurrentBranch = 0;
+        CurrentLineNum = 0;
         choices.Clear();
         currentChoice = null;
         DialogueState = State.Unloaded;
@@ -432,5 +435,12 @@ public class DialogueManager
     private DialogueResult HandleException(DialogueException ex)
     {
         return new DialogueResult(false, ex.Message, ex.Error, ex.CurrentBranch >= 0 ? ex.CurrentBranch : null, ex.CurrentLine >= 0 ? ex.CurrentLine : null);
+    }
+
+    public void SetLine (int branch, int line)
+    {
+        CurrentBranch = branch;
+        CurrentLineNum = line;
+        UpdateLine();
     }
 }

@@ -1,0 +1,10 @@
+Narrator: The old library is unusually quiet.
+    mood: mysterious
+    location: old_library
+    condition: has_entered_library
+    precondition: has_key
+    postcondition: visited_library
+
+Nelson: I found a note on the table.
+    emotion: curious
+    custom-flag: example value

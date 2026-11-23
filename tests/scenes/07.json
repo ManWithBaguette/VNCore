@@ -1,0 +1,22 @@
+{
+  "0": {
+    "0": {
+      "Speaker": "Nelson",
+      "Text": "Test 7",
+      "VNCoreData": {},
+      "Metadata": {
+        "anger": " \u002B3",
+        "x": " \u002B4",
+        "y": " \u002B5"
+      },
+      "Choices": {}
+    },
+    "1": {
+      "Speaker": "SaveInfo",
+      "Text": "$\u0022Test 7 Anger is {anger}, x is {x}, y is {y}",
+      "VNCoreData": {},
+      "Metadata": {},
+      "Choices": {}
+    }
+  }
+}

@@ -1,0 +1,6 @@
+:
+    player_name: Nelson
+    count_count: 10
+
+Narrator: $"Welcome back, {player_name}."
+Nelson: $"You currently have {coin_count} coins."
