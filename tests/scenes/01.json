@@ -1,0 +1,25 @@
+{
+  "0": {
+    "0": {
+      "Speaker": "Narrator",
+      "Text": "The room is quiet.",
+      "VNCoreData": {},
+      "Metadata": {},
+      "Choices": {}
+    },
+    "1": {
+      "Speaker": "Nelson",
+      "Text": "I think someone was here. The window is still open. There are footprints near the desk.",
+      "VNCoreData": {},
+      "Metadata": {},
+      "Choices": {}
+    },
+    "2": {
+      "Speaker": "Bobby",
+      "Text": "Then we should look around.",
+      "VNCoreData": {},
+      "Metadata": {},
+      "Choices": {}
+    }
+  }
+}

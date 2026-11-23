@@ -1,0 +1,7 @@
+Nelson: Test 7
+    anger: +3
+    x: +4
+    y: +5
+
+SaveInfo: Test 7
+$"Anger is {anger}, x is {x}, y is {y}

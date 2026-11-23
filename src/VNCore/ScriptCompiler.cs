@@ -70,6 +70,8 @@ public class ScriptCompiler
 
             while (fileQueue.Count > 0)
             {   
+                mainState = MainState.None;
+                blockState = BlockState.None;
                 lines = new Dictionary<int, DialogueLine>();
                 branchId ++;
                 lineId = -1;
@@ -77,8 +79,6 @@ public class ScriptCompiler
             
                 foreach (var line in File.ReadLines(fileQueue.Dequeue()))
                 {
-                    mainState = MainState.None;
-                    blockState = BlockState.None;
                     
                     int indentation = GetIndentation(line);
                     string trimmed = line.Trim();
@@ -90,7 +90,6 @@ public class ScriptCompiler
                     {
                         case MainState.SettingSpeaker:
                             SetSpeaker();
-                            Console.WriteLine("Speaker Set");
                             break;
 
                         case MainState.SettingText: 
@@ -121,8 +120,11 @@ public class ScriptCompiler
                 }
             }
             string json = JsonSerializer.Serialize(scene, JsonContext.Default.DictionaryInt32DictionaryInt32DialogueLine);
-            Console.WriteLine($"{outputPath}.json");
-            File.WriteAllText($"scenes\\{outputPath}.json", json);
+            if (!outputPath.ToLower().EndsWith(".json"))
+            {
+                outputPath += ".json";
+            }
+            File.WriteAllText(outputPath, json);
             return new CompileResult(true);
         }
         catch (ScriptCompileException ex)
@@ -151,7 +153,6 @@ public class ScriptCompiler
         }
 
         lineText += (lineText.Length > 0 ? " " : "") + line;
-        Console.WriteLine($"Text Added: {line}");
 
         if (mainState == MainState.SettingText)
         {
@@ -162,11 +163,6 @@ public class ScriptCompiler
             scene[branchId][lineId].Choices[choiceId].Text = lineText;
         }
 
-        Console.WriteLine(
-            $"Saving line {lineId}: " +
-            $"speaker='{scene[branchId][lineId].Speaker}', " +
-            $"text='{lineText}'"
-        );
     }
 
     private void SetSpeaker()
@@ -233,7 +229,6 @@ public class ScriptCompiler
             else if (blockState == BlockState.SettingChoiceData)
                 scene[branchId][lineId].Choices[choiceId].VNCoreData[lineFlag] = switchTarget;
 
-            Console.WriteLine("Switch flag set");
             return;
         }
 
@@ -242,24 +237,21 @@ public class ScriptCompiler
             if (blockState == BlockState.SettingMetadata)
             {
                 scene[branchId][lineId].VNCoreData[lineFlag] = lineParameter;
-                Console.WriteLine("LineData Set");
             }
             else if (blockState == BlockState.SettingChoiceData)
             {
                 scene[branchId][lineId].Choices[choiceId].VNCoreData[lineFlag] = lineParameter;
-                Console.WriteLine("ChoiceData Set");
             }
         } else
         {
             if (blockState == BlockState.SettingMetadata)
-            {
+            {   
+                Console.WriteLine(lineFlag);
                 scene[branchId][lineId].Metadata[lineFlag] = lineParameter;
-                Console.WriteLine("LineData Set");
             }
             else if (blockState == BlockState.SettingChoiceData)
             {
                 scene[branchId][lineId].Choices[choiceId].Metadata[lineFlag] = lineParameter;
-                Console.WriteLine("ChoiceData Set");
             }
         }
         
@@ -340,7 +332,6 @@ public class ScriptCompiler
                     return;
 
                 case 3:
-                Console.WriteLine("Choice Data detected");
                     blockState = BlockState.SettingChoiceData;
                     return;
             }

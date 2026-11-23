@@ -1,0 +1,2 @@
+Narrator: You arrive at a fork in the road.
+    switch: line:0 path:tests/scripts/06_branch_target.txt

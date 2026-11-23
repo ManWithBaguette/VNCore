@@ -14,14 +14,14 @@ public class SaveData
         {
             Update(item.Key, item.Value);
         }
-        Console.WriteLine("Data updated");
+        // Console.WriteLine("Data updated");
         if (Data.ContainsKey("anger"))
         {
-            Console.WriteLine($"New anger value: {Data["anger"]}");
+            // Console.WriteLine($"New anger value: {Data["anger"]}");
         }
         if (Data.ContainsKey("x"))
         {
-            Console.WriteLine($"New x value: {Data["x"]}");
+            // Console.WriteLine($"New x value: {Data["x"]}");
         }
     }
 
@@ -53,10 +53,10 @@ public class SaveData
             return;
         }
 
-        Console.WriteLine($"Key: {key}");
-        Console.WriteLine($"Input: {value}");
-        Console.WriteLine($"Current value: {currentValue}");
-        Console.WriteLine($"Operand: {operand}");
+        // Console.WriteLine($"Key: {key}");
+        // Console.WriteLine($"Input: {value}");
+        // Console.WriteLine($"Current value: {currentValue}");
+        // Console.WriteLine($"Operand: {operand}");
 
         double result = value[0] switch
         {
@@ -67,9 +67,9 @@ public class SaveData
             '/' => throw new DivideByZeroException(),
             _ => throw new ArgumentException($"Unknown operation: {value[0]}")
         };
-        Console.WriteLine($"In update: {result}");
+        // Console.WriteLine($"In update: {result}");
         Data[key] = result.ToString(CultureInfo.InvariantCulture);
-        Console.WriteLine("Data updated");
+        // Console.WriteLine("Data updated");
     }
 
     public Boolean Compare(string value)

@@ -1,0 +1,12 @@
+Guide: Which path will you take?
+    choice:
+        choice-1: Enter the forest
+            extra: has_map
+            destination-name: forest
+        choice-2: Follow the road
+            extra: road_is_open
+            destination-name: road
+        choice-3: Return to the village
+            destination-name: village
+
+Narrator: You have made your decision.
