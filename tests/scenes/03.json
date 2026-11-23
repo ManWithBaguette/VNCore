@@ -1,0 +1,42 @@
+{
+  "0": {
+    "0": {
+      "Speaker": "Guide",
+      "Text": "Which path will you take?",
+      "VNCoreData": {},
+      "Metadata": {},
+      "Choices": {
+        "1": {
+          "Text": "Enter the forest",
+          "VNCoreData": {},
+          "Metadata": {
+            "extra": " has_map",
+            "destination-name": " forest"
+          }
+        },
+        "2": {
+          "Text": "Follow the road",
+          "VNCoreData": {},
+          "Metadata": {
+            "extra": " road_is_open",
+            "destination-name": " road"
+          }
+        },
+        "3": {
+          "Text": "Return to the village",
+          "VNCoreData": {},
+          "Metadata": {
+            "destination-name": " village"
+          }
+        }
+      }
+    },
+    "1": {
+      "Speaker": "Narrator",
+      "Text": "You have made your decision.",
+      "VNCoreData": {},
+      "Metadata": {},
+      "Choices": {}
+    }
+  }
+}

@@ -3,6 +3,8 @@ using VNCore.Compiler;
 using VNCore.Dialogue;
 using VNCore.DialogueManager;
 
+int MAX_ITERATIONS = 100;
+
 // var compiler = new ScriptCompiler();
 
 // compiler.Compile("test-data/refactorTest.txt", "refactor");
@@ -62,7 +64,8 @@ int RunTests()
         return 1;
     if (!Test_02())
         return 1;
-
+    if (!Test_03())
+        return 1;
     return 0;
 }
 
@@ -104,6 +107,65 @@ bool Test_02()
     return true;
 }
 
+bool Test_03()
+{
+    if (!InitializeTest(3))
+        return false;
+    
+    while (manager.DialogueState != State.End)
+    {
+        DialogueManager.DialogueResult result = manager.Advance();
+        if (manager.DialogueState == State.Choice)
+        {
+            result = IterateThroughChoice();
+        }
+        if (!result.Success)
+        {   
+            Console.WriteLine("\nTest_02 Failure");
+            Console.WriteLine(result.ErrorMessage);
+            return false;
+        }
+    }
+    return true;
+}
+
+DialogueManager.DialogueResult IterateThroughChoice()
+{
+    int choiceBranch = manager.CurrentBranch;
+    int choiceLine = manager.CurrentLineNum;
+    int choiceCount = manager.Choices.Count;
+    var choiceKeys = manager.Choices.Keys.ToList();
+
+    foreach (int choiceKey in choiceKeys)
+    {
+        int iterations = 0;
+
+        manager.SetLine(choiceBranch, choiceLine);
+        DialogueManager.DialogueResult selection = manager.SelectChoice(choiceKey);
+
+        if (!selection.Success)
+            return selection;
+
+        while (manager.DialogueState != State.End)
+        {
+            if (iterations++ > MAX_ITERATIONS)
+            {
+                throw new Exception($"Dialogue path failed to terminate:\nBranch: {choiceBranch}\nLine: {choiceLine}\nChoice Number: {choiceKey}");
+            }
+            manager.Advance();
+            if (manager.DialogueState == State.Choice)
+            {
+                DialogueManager.DialogueResult result = IterateThroughChoice();
+
+                if (!result.Success)
+                    return result;
+            }
+        }
+        Console.WriteLine($"{choiceBranch}:{choiceLine} Choice: {choiceKey} Successfully reached end");
+    }
+    return new DialogueManager.DialogueResult(true);
+}
+
 bool InitializeTest(int test)
 {
     string scriptPath;
@@ -141,7 +203,7 @@ bool InitializeTest(int test)
     }
 
     DialogueManager.DialogueResult dialogueResult = manager.LoadScene(scenePath);
-    
+
     if (!dialogueResult.Success)
     {
         Console.WriteLine($"{dialogueResult.ErrorMessage}");
