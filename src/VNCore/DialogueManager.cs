@@ -447,4 +447,14 @@ public class DialogueManager
         CurrentLineNum = line;
         UpdateLine();
     }
+
+    public void SetSaveData (SaveData save)
+    {
+        saveData = save;
+    }
+
+    public void RemoveSaveData ()
+    {
+        saveData = new SaveData();
+    }
 }
