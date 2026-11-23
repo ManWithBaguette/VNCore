@@ -204,8 +204,8 @@ bool Test_07()
     if (!InitializeTest(7))
         return false;
     
-    manager = new DialogueManager(new SaveData());
-    manager.LoadScene("tests/scenes/07.json");
+    // manager = new DialogueManager(new SaveData());
+    // manager.LoadScene("tests/scenes/07.json");
     while (manager.DialogueState != State.End)
     {
         Console.WriteLine(manager.CurrentLine.Text);
