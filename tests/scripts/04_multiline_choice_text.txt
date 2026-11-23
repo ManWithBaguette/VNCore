@@ -1,0 +1,8 @@
+Guide: Select a response.
+    choice:
+        choice-1: Ask about the missing key
+        The guide looks toward the locked cabinet.
+        choice-2: Ask about the old library
+        The guide pauses before answering.
+
+Narrator: The conversation continues.

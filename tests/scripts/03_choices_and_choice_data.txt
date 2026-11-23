@@ -1,0 +1,12 @@
+Guide: Which path will you take?
+    choice:
+        choice-1: Enter the forest
+            precondition: has_map
+            destination-name: forest
+        choice-2: Follow the road
+            precondition: road_is_open
+            destination-name: road
+        choice-3: Return to the village
+            destination-name: village
+
+Narrator: You have made your decision.

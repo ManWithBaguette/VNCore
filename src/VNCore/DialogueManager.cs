@@ -81,6 +81,10 @@ public class DialogueManager
 
         try
         {
+            if (!path.ToLower().EndsWith(".json"))
+            {
+                path = path += ".json";
+            }
             string jsonContent = File.ReadAllText(path);
             loadedScene = JsonSerializer.Deserialize<Dictionary<int, Dictionary<int, DialogueLine>>>(jsonContent);
 
@@ -218,7 +222,6 @@ public class DialogueManager
         }
         if (selectedChoice.VNCoreData.TryGetValue("switch", out string? destination))
         {
-            Console.WriteLine("Switch on Choice");
             return Switch(destination);
         }
         return MoveToNextLine();
