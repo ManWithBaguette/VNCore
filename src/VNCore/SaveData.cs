@@ -26,22 +26,31 @@ public class SaveData
     }
 
     public void Update(string key, string value)
-        {
+    {
+        value = value.Trim();
+
         if (!Data.ContainsKey(key))
         {
             Data[key] = "0";
             Console.WriteLine("entry added");
         }
 
-        // Direct assignment only if the value isn't an operation
-        if (value.Length > 0 && !"+-*/".Contains(value[0]) && double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double directValue))
+        // Direct assignment
+        if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double directValue))
         {
             Data[key] = directValue.ToString(CultureInfo.InvariantCulture);
             return;
         }
 
-        // Parse operation, e.g. +3, -2, *4, /2
-        if (value.Length < 2 || !double.TryParse(value.Substring(1), NumberStyles.Float, CultureInfo.InvariantCulture, out double operand))
+        // String Assignment
+        if (!"+-*/".Contains(value[0]))
+        {
+            Data[key] = value;
+            return;
+        }
+
+        // Parse operation
+        if (value.Length < 2 || !"+-*/".Contains(value[0]) || !double.TryParse(value.Substring(1).Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out double operand))
         {
             Console.WriteLine("Invalid operation or value");
             return;
@@ -74,48 +83,54 @@ public class SaveData
 
     public Boolean Compare(string value)
     {   
-        var match = Regex.Match(value, @"^\s*(\w+|-?\d+(?:\.\d+)?)\s*(<=|>=|==|!=|<|>)\s*(\w+|-?\d+(?:\.\d+)?)\s*$");
+        var match = Regex.Match(value, @"^\s*(\w+|[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)\s*(<=|>=|==|!=|<|>)\s*(\w+|[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)\s*$");
+
+        if (!match.Success)
+        {
+            throw new ArgumentException($"Invalid comparison expression: {value}");
+        }
 
         string left = match.Groups[1].Value;
         string operation = match.Groups[2].Value;
         string right = match.Groups[3].Value;
 
-        double GetValue(String operand)
+        string GetValue(String operand)
         {
-            if (double.TryParse(
-            operand,
-            NumberStyles.Float,
-            CultureInfo.InvariantCulture,
-            out double number))
-        {
-            return number;
+            if (Data.TryGetValue(operand, out string? storedValue))
+            {
+                return storedValue;
+            }
+
+            return operand;
         }
 
-        if (Data.TryGetValue(operand, out string value) &&
-            double.TryParse(
-                value,
-                NumberStyles.Float,
-                CultureInfo.InvariantCulture,
-                out number))
+        string a = GetValue(left);
+        string b = GetValue(right);
+
+        bool aNumeric = double.TryParse(a, NumberStyles.Float, CultureInfo.InvariantCulture, out double aNumber);
+        bool bNumeric = double.TryParse(b, NumberStyles.Float, CultureInfo.InvariantCulture, out double bNumber);
+
+        // Numeric comparison
+        if (aNumeric && bNumeric)
         {
-            return number;
+            return operation switch
+            {
+                "<"  => aNumber < bNumber,
+                ">"  => aNumber > bNumber,
+                "<=" => aNumber <= bNumber,
+                ">=" => aNumber >= bNumber,
+                "==" => aNumber == bNumber,
+                "!=" => aNumber != bNumber,
+                _ => false
+            };
         }
 
-        throw new ArgumentException(
-            $"Unknown variable or invalid number: {operand}");
-        }
-        double a = GetValue(left);
-        double b = GetValue(right);
-
+        // String comparison
         return operation switch
         {
-            "<"  => a < b,
-            ">"  => a > b,
-            "<=" => a <= b,
-            ">=" => a >= b,
             "==" => a == b,
             "!=" => a != b,
-            _ => false
+            _ => throw new ArgumentException("Strings only support == and != comparisons.")
         };
     }
 

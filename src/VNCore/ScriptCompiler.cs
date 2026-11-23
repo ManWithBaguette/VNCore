@@ -236,22 +236,25 @@ public class ScriptCompiler
         {
             if (blockState == BlockState.SettingMetadata)
             {
-                scene[branchId][lineId].VNCoreData[lineFlag] = lineParameter;
+                scene[branchId][lineId].VNCoreData[lineFlag] = lineParameter.Trim();
+                Console.WriteLine("LineData Set");
             }
             else if (blockState == BlockState.SettingChoiceData)
             {
-                scene[branchId][lineId].Choices[choiceId].VNCoreData[lineFlag] = lineParameter;
+                scene[branchId][lineId].Choices[choiceId].VNCoreData[lineFlag] = lineParameter.Trim();
+                Console.WriteLine("ChoiceData Set");
             }
         } else
         {
             if (blockState == BlockState.SettingMetadata)
-            {   
-                Console.WriteLine(lineFlag);
-                scene[branchId][lineId].Metadata[lineFlag] = lineParameter;
+            {
+                scene[branchId][lineId].Metadata[lineFlag] = lineParameter.Trim();
+                Console.WriteLine("LineData Set");
             }
             else if (blockState == BlockState.SettingChoiceData)
             {
-                scene[branchId][lineId].Choices[choiceId].Metadata[lineFlag] = lineParameter;
+                scene[branchId][lineId].Choices[choiceId].Metadata[lineFlag] = lineParameter.Trim();
+                Console.WriteLine("ChoiceData Set");
             }
         }
         
