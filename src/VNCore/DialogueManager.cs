@@ -295,6 +295,11 @@ public class DialogueManager
 
             currentLine = new DialogueLine(line);
 
+            if (string.IsNullOrWhiteSpace(currentLine.Speaker) && string.IsNullOrWhiteSpace(currentLine.Text))
+            {
+                CurrentLineNum++;
+                continue;
+            }
 
             if (currentLine.VNCoreData.TryGetValue("precondition", out var condition))
             {

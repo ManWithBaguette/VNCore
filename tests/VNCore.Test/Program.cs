@@ -84,6 +84,7 @@ bool Test_01()
     
     while (manager.DialogueState != State.End)
     {
+        Console.WriteLine(manager.CurrentLine.Speaker);
         DialogueManager.DialogueResult result = manager.Advance();
         if (!result.Success)
         {   
