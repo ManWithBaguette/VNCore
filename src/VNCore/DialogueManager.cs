@@ -34,6 +34,7 @@ public class DialogueManager
     private Dictionary<int, Dictionary<int, DialogueLine>> scene = new();
     private DialogueLine currentLine = new();
     public DialogueLine CurrentLine => currentLine;
+    private DialogueLine LastValidLine;
     public int CurrentBranch { get; private set; } = 0;
     public int CurrentLineNum { get; private set; } = 0;
 
@@ -279,6 +280,7 @@ public class DialogueManager
             if (!branch.TryGetValue(CurrentLineNum, out var line))
             {
                 Console.WriteLine("End of Branch reached.");
+                currentLine = LastValidLine;
                 currentChoice = null;
                 choices.Clear();
                 DialogueState = State.Last;
@@ -292,11 +294,12 @@ public class DialogueManager
             {
                 throw new DialogueException(DialogueError.InvalidScene, $"Line {CurrentLineNum} in branch {CurrentBranch} is null", CurrentBranch, CurrentLineNum);
             }
-
+            
             currentLine = new DialogueLine(line);
 
             if (string.IsNullOrWhiteSpace(currentLine.Speaker) && string.IsNullOrWhiteSpace(currentLine.Text))
             {
+                saveData?.Update(currentLine.Metadata);
                 CurrentLineNum++;
                 continue;
             }
@@ -315,12 +318,14 @@ public class DialogueManager
                 currentLine.Text = ReplaceFString(CurrentLine.Text);
             }
 
-            OnDialogueChanged?.Invoke(currentLine);
 
             UpdateChoices();
             DialogueState = choices.Count > 0 ? State.Choice : State.Dialogue;
 
+            OnDialogueChanged?.Invoke(currentLine);
             OnChoicesUpdated?.Invoke(Choices);
+
+            LastValidLine = currentLine;
             return new DialogueResult(true);
         }
     }
@@ -417,8 +422,8 @@ public class DialogueManager
     public void UnloadScene()
     {
         scene.Clear();
-        saveData = new SaveData();
         currentLine = new DialogueLine();
+        LastValidLine = new DialogueLine();
         CurrentBranch = 0;
         CurrentLineNum = 0;
         choices.Clear();

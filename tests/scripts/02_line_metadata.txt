@@ -1,10 +1,19 @@
+:
+    has_key: true
+
 Narrator: The old library is unusually quiet.
     mood: mysterious
     location: old_library
     condition: has_entered_library
-    testprecondition: has_key
+    precondition: has_key
     postcondition: visited_library
+
+:
+    has_key: false
 
 Nelson: I found a note on the table.
     emotion: curious
     custom-flag: example value
+
+Bobby: Check has_key
+    precondition: has_key
