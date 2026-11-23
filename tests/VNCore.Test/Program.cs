@@ -104,6 +104,7 @@ bool Test_02()
 
     while (manager.DialogueState != State.End)
     {
+        Console.WriteLine(manager.CurrentLine.Text);
         DialogueManager.DialogueResult result = manager.Advance();
         if (!result.Success)
         {   

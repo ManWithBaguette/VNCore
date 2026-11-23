@@ -24,6 +24,15 @@
       "Choices": {}
     },
     "2": {
+      "Speaker": "",
+      "Text": "",
+      "VNCoreData": {},
+      "Metadata": {
+        "has_key": "false"
+      },
+      "Choices": {}
+    },
+    "3": {
       "Speaker": "Nelson",
       "Text": "I found a note on the table.",
       "VNCoreData": {},
@@ -31,6 +40,15 @@
         "emotion": "curious",
         "custom-flag": "example value"
       },
+      "Choices": {}
+    },
+    "4": {
+      "Speaker": "Bobby",
+      "Text": "Check has_key",
+      "VNCoreData": {
+        "precondition": "has_key"
+      },
+      "Metadata": {},
       "Choices": {}
     }
   }
