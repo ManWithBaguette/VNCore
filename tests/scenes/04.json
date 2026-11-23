@@ -1,0 +1,29 @@
+{
+  "0": {
+    "0": {
+      "Speaker": "Guide",
+      "Text": "Select a response.",
+      "VNCoreData": {},
+      "Metadata": {},
+      "Choices": {
+        "1": {
+          "Text": "Ask about the missing key The guide looks toward the locked cabinet.",
+          "VNCoreData": {},
+          "Metadata": {}
+        },
+        "2": {
+          "Text": "Ask about the old library The guide pauses before answering.",
+          "VNCoreData": {},
+          "Metadata": {}
+        }
+      }
+    },
+    "1": {
+      "Speaker": "Narrator",
+      "Text": "The conversation continues.",
+      "VNCoreData": {},
+      "Metadata": {},
+      "Choices": {}
+    }
+  }
+}

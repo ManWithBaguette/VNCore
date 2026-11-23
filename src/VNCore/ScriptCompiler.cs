@@ -242,7 +242,8 @@ public class ScriptCompiler
         } else
         {
             if (blockState == BlockState.SettingMetadata)
-            {
+            {   
+                Console.WriteLine(lineFlag);
                 scene[branchId][lineId].Metadata[lineFlag] = lineParameter;
             }
             else if (blockState == BlockState.SettingChoiceData)

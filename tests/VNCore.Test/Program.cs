@@ -66,6 +66,12 @@ int RunTests()
         return 1;
     if (!Test_03())
         return 1;
+    if (!Test_04())
+        return 1;
+    if (!Test_05())
+        return 1;
+    // if (!Test_06())
+    //     return 1;
     return 0;
 }
 
@@ -121,11 +127,73 @@ bool Test_03()
         }
         if (!result.Success)
         {   
-            Console.WriteLine("\nTest_02 Failure");
+            Console.WriteLine("\nTest_03 Failure");
             Console.WriteLine(result.ErrorMessage);
             return false;
         }
     }
+    Console.WriteLine("Test_03 Success");
+    return true;
+}
+
+bool Test_04()
+{
+    if (!InitializeTest(4))
+        return false;
+    
+    while (manager.DialogueState != State.End)
+    {
+        DialogueManager.DialogueResult result = manager.Advance();
+        if (manager.DialogueState == State.Choice)
+        {
+            result = IterateThroughChoice();
+        }
+        if (!result.Success)
+        {   
+            Console.WriteLine("\nTest_04 Failure");
+            Console.WriteLine(result.ErrorMessage);
+            return false;
+        }
+    }
+    Console.WriteLine("Test_04 Success");
+    return true;
+}
+
+bool Test_05()
+{
+    if (!InitializeTest(5))
+        return false;
+    
+    while (manager.DialogueState != State.End)
+    {
+        DialogueManager.DialogueResult result = manager.Advance();
+        if (!result.Success)
+        {   
+            Console.WriteLine("\nTest_05 Failure");
+            Console.WriteLine(result.ErrorMessage);
+            return false;
+        }
+    }
+    Console.WriteLine("Test_05 Success");
+    return true;
+}
+
+bool Test_06()
+{
+    if (!InitializeTest(6))
+        return false;
+    
+    while (manager.DialogueState != State.End)
+    {
+        DialogueManager.DialogueResult result = manager.Advance();
+        if (!result.Success)
+        {   
+            Console.WriteLine("\nTest_06 Failure");
+            Console.WriteLine(result.ErrorMessage);
+            return false;
+        }
+    }
+    Console.WriteLine("Test_06 Success");
     return true;
 }
 
@@ -185,6 +253,21 @@ bool InitializeTest(int test)
         case 3:
             scriptPath = "tests/scripts/03_choices_and_choice_data.txt";
             scenePath = "tests/scenes/03";
+            break;
+
+        case 4:
+            scriptPath = "tests/scripts/04_multiline_choice_text.txt";
+            scenePath = "tests/scenes/04";
+            break;
+
+        case 5:
+            scriptPath = "tests/scripts/05_fstring_text.txt";
+            scenePath = "tests/scenes/05";
+            break;
+
+        case 6:
+            scriptPath = "tests/scripts/06_branch_main.txt";
+            scenePath = "tests/scenes/06";
             break;
 
         default:

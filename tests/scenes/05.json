@@ -1,0 +1,21 @@
+{
+  "0": {
+    "0": {
+      "Speaker": "",
+      "Text": "",
+      "VNCoreData": {},
+      "Metadata": {
+        "player_name": " Nelson",
+        "count_count": " 10"
+      },
+      "Choices": {}
+    },
+    "1": {
+      "Speaker": "Narrator",
+      "Text": "$\u0022Welcome back, {player_name}.\u0022 Nelson: $\u0022You currently have {coin_count} coins.\u0022",
+      "VNCoreData": {},
+      "Metadata": {},
+      "Choices": {}
+    }
+  }
+}
