@@ -77,6 +77,9 @@ public class ScriptCompiler
             
                 foreach (var line in File.ReadLines(fileQueue.Dequeue()))
                 {
+                    mainState = MainState.None;
+                    blockState = BlockState.None;
+                    
                     int indentation = GetIndentation(line);
                     string trimmed = line.Trim();
 
