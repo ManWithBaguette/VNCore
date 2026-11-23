@@ -34,7 +34,7 @@ public class DialogueManager
     private Dictionary<int, Dictionary<int, DialogueLine>> scene = new();
     private DialogueLine currentLine = new();
     public DialogueLine CurrentLine => currentLine;
-    private DialogueLine LastValidLine;
+    private DialogueLine LastValidLine = new DialogueLine();
     public int CurrentBranch { get; private set; } = 0;
     public int CurrentLineNum { get; private set; } = 0;
 
