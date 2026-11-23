@@ -76,33 +76,29 @@ public class SaveData
     {   
         var match = Regex.Match(value, @"^\s*(\w+|-?\d+(?:\.\d+)?)\s*(<=|>=|==|!=|<|>)\s*(\w+|-?\d+(?:\.\d+)?)\s*$");
 
+        if (!match.Success)
+        {
+            throw new ArgumentException($"Invalid comparison expression: {value}");
+        }
+
         string left = match.Groups[1].Value;
         string operation = match.Groups[2].Value;
         string right = match.Groups[3].Value;
 
         double GetValue(String operand)
         {
-            if (double.TryParse(
-            operand,
-            NumberStyles.Float,
-            CultureInfo.InvariantCulture,
-            out double number))
-        {
-            return number;
-        }
+            if (double.TryParse(operand, NumberStyles.Float, CultureInfo.InvariantCulture, out double number))
+            {
+                return number;
+            }
 
-        if (Data.TryGetValue(operand, out string value) &&
-            double.TryParse(
-                value,
-                NumberStyles.Float,
-                CultureInfo.InvariantCulture,
-                out number))
-        {
-            return number;
-        }
+            if (Data.TryGetValue(operand, out string? value) && double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out number))
+            {
+                return number;
+            }
 
-        throw new ArgumentException(
-            $"Unknown variable or invalid number: {operand}");
+            throw new ArgumentException(
+                $"Unknown variable or invalid number: {operand}");
         }
         double a = GetValue(left);
         double b = GetValue(right);
