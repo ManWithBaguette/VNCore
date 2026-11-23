@@ -87,6 +87,12 @@ public class SaveData
 
         if (!match.Success)
         {
+
+            if (Data.TryGetValue(value, out string? storedValue))
+            {
+                return storedValue == "true";
+            }
+
             throw new ArgumentException($"Invalid comparison expression: {value}");
         }
 

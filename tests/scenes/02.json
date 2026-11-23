@@ -1,20 +1,29 @@
 {
   "0": {
     "0": {
-      "Speaker": "Narrator",
-      "Text": "The old library is unusually quiet.",
-      "VNCoreData": {
-        "condition": "has_entered_library",
-        "postcondition": "visited_library"
-      },
+      "Speaker": "",
+      "Text": "",
+      "VNCoreData": {},
       "Metadata": {
-        "mood": "mysterious",
-        "location": "old_library",
-        "testprecondition": "has_key"
+        "has_key": "true"
       },
       "Choices": {}
     },
     "1": {
+      "Speaker": "Narrator",
+      "Text": "The old library is unusually quiet.",
+      "VNCoreData": {
+        "condition": "has_entered_library",
+        "precondition": "has_key",
+        "postcondition": "visited_library"
+      },
+      "Metadata": {
+        "mood": "mysterious",
+        "location": "old_library"
+      },
+      "Choices": {}
+    },
+    "2": {
       "Speaker": "Nelson",
       "Text": "I found a note on the table.",
       "VNCoreData": {},
