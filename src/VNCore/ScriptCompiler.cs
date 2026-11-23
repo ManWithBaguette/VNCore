@@ -70,6 +70,8 @@ public class ScriptCompiler
 
             while (fileQueue.Count > 0)
             {   
+                mainState = MainState.None;
+                blockState = BlockState.None;
                 lines = new Dictionary<int, DialogueLine>();
                 branchId ++;
                 lineId = -1;
@@ -77,8 +79,6 @@ public class ScriptCompiler
             
                 foreach (var line in File.ReadLines(fileQueue.Dequeue()))
                 {
-                    mainState = MainState.None;
-                    blockState = BlockState.None;
                     
                     int indentation = GetIndentation(line);
                     string trimmed = line.Trim();

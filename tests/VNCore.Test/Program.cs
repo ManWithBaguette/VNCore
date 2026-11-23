@@ -70,8 +70,10 @@ int RunTests()
         return 1;
     if (!Test_05())
         return 1;
-    // if (!Test_06())
-    //     return 1;
+    if (!Test_06())
+        return 1;
+    if (!Test_07())
+        return 1;
     return 0;
 }
 
@@ -197,6 +199,28 @@ bool Test_06()
     return true;
 }
 
+bool Test_07()
+{
+    if (!InitializeTest(7))
+        return false;
+    
+    manager = new DialogueManager(new SaveData());
+    manager.LoadScene("tests/scenes/07.json");
+    while (manager.DialogueState != State.End)
+    {
+        Console.WriteLine(manager.CurrentLine.Text);
+        DialogueManager.DialogueResult result = manager.Advance();
+        if (!result.Success)
+        {   
+            Console.WriteLine("\nTest_07 Failure");
+            Console.WriteLine(result.ErrorMessage);
+            return false;
+        }
+    }
+    Console.WriteLine("Test_07 Success");
+    return true;
+}
+
 DialogueManager.DialogueResult IterateThroughChoice()
 {
     int choiceBranch = manager.CurrentBranch;
@@ -268,6 +292,11 @@ bool InitializeTest(int test)
         case 6:
             scriptPath = "tests/scripts/06_branch_main.txt";
             scenePath = "tests/scenes/06";
+            break;
+
+        case 7:
+            scriptPath = "tests/scripts/07_savedata.txt";
+            scenePath = "tests/scenes/07";
             break;
 
         default:

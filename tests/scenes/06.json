@@ -1,0 +1,29 @@
+{
+  "0": {
+    "0": {
+      "Speaker": "Narrator",
+      "Text": "You arrive at a fork in the road.",
+      "VNCoreData": {
+        "switch": "1:0"
+      },
+      "Metadata": {},
+      "Choices": {}
+    }
+  },
+  "1": {
+    "0": {
+      "Speaker": "Narrator",
+      "Text": "You take the path leading into the forest.",
+      "VNCoreData": {},
+      "Metadata": {},
+      "Choices": {}
+    },
+    "1": {
+      "Speaker": "Bobby",
+      "Text": "The trees are much denser here.",
+      "VNCoreData": {},
+      "Metadata": {},
+      "Choices": {}
+    }
+  }
+}
