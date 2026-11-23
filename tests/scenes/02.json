@@ -4,13 +4,13 @@
       "Speaker": "Narrator",
       "Text": "The old library is unusually quiet.",
       "VNCoreData": {
-        "condition": " has_entered_library",
-        "precondition": " has_key",
-        "postcondition": " visited_library"
+        "condition": "has_entered_library",
+        "postcondition": "visited_library"
       },
       "Metadata": {
-        "mood": " mysterious",
-        "location": " old_library"
+        "mood": "mysterious",
+        "location": "old_library",
+        "testprecondition": "has_key"
       },
       "Choices": {}
     },
@@ -19,8 +19,8 @@
       "Text": "I found a note on the table.",
       "VNCoreData": {},
       "Metadata": {
-        "emotion": " curious",
-        "custom-flag": " example value"
+        "emotion": "curious",
+        "custom-flag": "example value"
       },
       "Choices": {}
     }

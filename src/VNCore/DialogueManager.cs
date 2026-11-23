@@ -61,7 +61,10 @@ public class DialogueManager
         int? Line = null
     );
 
-    public DialogueManager() {}
+    public DialogueManager()
+    {
+        saveData = new SaveData();
+    }
 
     public DialogueManager(SaveData saveData)
     {
@@ -409,6 +412,7 @@ public class DialogueManager
     public void UnloadScene()
     {
         scene.Clear();
+        saveData = new SaveData();
         currentLine = new DialogueLine();
         CurrentBranch = 0;
         CurrentLineNum = 0;

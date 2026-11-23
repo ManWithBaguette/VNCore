@@ -10,23 +10,23 @@
           "Text": "Enter the forest",
           "VNCoreData": {},
           "Metadata": {
-            "extra": " has_map",
-            "destination-name": " forest"
+            "extra": "has_map",
+            "destination-name": "forest"
           }
         },
         "2": {
           "Text": "Follow the road",
           "VNCoreData": {},
           "Metadata": {
-            "extra": " road_is_open",
-            "destination-name": " road"
+            "extra": "road_is_open",
+            "destination-name": "road"
           }
         },
         "3": {
           "Text": "Return to the village",
           "VNCoreData": {},
           "Metadata": {
-            "destination-name": " village"
+            "destination-name": "village"
           }
         }
       }
