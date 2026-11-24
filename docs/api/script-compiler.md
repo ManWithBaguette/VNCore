@@ -1,27 +1,40 @@
-### 1. ScriptCompiler
+# ScriptCompiler
 
-Namespace: VNCore.Compiler
+### Namespace: `VNCore.Compiler`
 
-The ScriptCompiler converts human-readable dialogue scripts into JSON scene data.
+`ScriptCompiler` converts formatted txt dialogue scripts into structured JSON scene data.
 
-It processes script files line by line, interpreting indentation and keywords to distinguish between dialogue, metadata, and choices.
+The compiler processes script files line by line, interpreting indentation and keywords to distinguish between dialogue, metadata, and choices, and generates a JSON representation that can be loaded by DialogueManager.
 
-The compiler also supports references to other script files, allowing multiple files to be compiled into separate dialogue branches within the same output.
+It also supports references to additional script files, allowing multiple files to be compiled into separate dialogue branches within the same output scene JSON.
 
-#### Public API:
+## Public API:
 ```
 public CompileResult Compile(string filepath, string outputPath); 
 ```
+Compiles a VNCore script txt and writes the resulting scene data to a JSON file.
+
 | Parameter | Description |
 |---|---|
 | filepath | Path to the source dialogue .txt script. |
-| outputPath | Destination for the compiled JSON scene file. |
+| outputPath | Destination path for the compiled JSON scene file. |
 
-The method returns a CompileResult containing: 
-
-- Success: Whether compilation completed successfully.
-- ErrorMessage: An optional description of the error.
-- Error: The assosciated CompileError value.
+The .txt and .json extension is automatically appended to the output path if not already present.
+Returns a CompileResult.
+### CompileResult
+Represents the outcome of a compilation operation.
+```
+public record CompileResult(
+  bool Success,
+  string? ErrorMessage = null,
+  CompileError? Error = CompileError.None
+);
+```
+| Property | Type | Description |
+|---|---|---|
+| Success | bool | Whether compilation succeeded |
+| ErrorMessage | string? | Description of an error, if available |
+| Error | CompileError? | Compilation error category |
 
 Usage Example:
 ```
