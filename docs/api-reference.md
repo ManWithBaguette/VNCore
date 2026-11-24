@@ -12,20 +12,20 @@ VNCore is organized around three primary responsibilities:
 ## Core Components
 | Component | Description | Documentation |
 |---|---|---|
-| ScriptCompiler | Compiles VNCore scripts into JSON scene data. | [Script Compiler](docs/api/script-compiler.md) |
-| DialogueManager | Manages dialogue progression, branching, and player choices. | [Dialogue Manager](docs/api/dialogue-manager.md) |
-| SaveData | Stores and manages runtime variables | [Save Data](docs/api/save-data.md) |
-| SaveManager | Handles JSON serialization and deserialization of save data. | [Save Manager](docs/api/save-manager.md) |
+| ScriptCompiler | Compiles VNCore scripts into JSON scene data. | [Script Compiler](api/script-compiler.md) |
+| DialogueManager | Manages dialogue progression, branching, and player choices. | [Dialogue Manager](api/dialogue-manager.md) |
+| SaveData | Stores and manages runtime variables | [Save Data](api/save-data.md) |
+| SaveManager | Handles JSON serialization and deserialization of save data. | [Save Manager](api/save-manager.md) |
 
 ## API Documentation
 ### Script Compilation
-- [ScriptCompiler](docs/api/script-compiler.md) - Compilation process and compiler functionality.
-- [Compile Results](docs/api/compile-results.md) - Compilation results and error information.
+- [ScriptCompiler](api/script-compiler.md) - Compilation process and compiler functionality.
+- [Compile Results](api/compile-results.md) - Compilation results and error information.
 ### Dialogue Management
-- [DialogueManager](docs/api/dialogue-manager.md) - Dialogue state and progression
-- [Dialogue Data](docs/api/dialogue-data.md) - Dialogue lines, elements, and related data structures.
-- [Dialogue Results](docs/api/dialogue-results.md) - Results returned by dialogue operations.
-- [Dialogue States and Errors](docs/api/dialogue-states-and-errors.md) - Available dialogue states and error types.
+- [DialogueManager](api/dialogue-manager.md) - Dialogue state and progression
+- [Dialogue Data](api/dialogue-data.md) - Dialogue lines, elements, and related data structures.
+- [Dialogue Results](api/dialogue-results.md) - Results returned by dialogue operations.
+- [Dialogue States and Errors](api/dialogue-states-and-errors.md) - Available dialogue states and error types.
 ### Save System
-- [SaveData](docs/api/save-data.md) - Runtime variable storage, updates, and comparisons.
-- [SaveManager](docs/api/save-manager.md) - Save file serialization and loading.
+- [SaveData](api/save-data.md) - Runtime variable storage, updates, and comparisons.
+- [SaveManager](api/save-manager.md) - Save file serialization and loading.
