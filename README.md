@@ -24,24 +24,6 @@ Save Data: Stores and modifies runtime variables, including arithmetic operation
 
 Event Notifications: Provides events for scene loading, dialogue changes, choice updates, and dialogue completion.
 ```
-## Usage
-
-VNCore is intended to be used as a library within other C# projects. The primary way to use VNCore is by importing its compiled DLL into your project and interacting with its public API.
-
-### Using VNCore:
-
-1. Obtain the compiled VNCore DLL.
-2. Add its reference to your C# project.
-3. Import the required VNCore namespaces.
-4. Use the provided classes to compile scripts, manage dialogue, and handle save data.
-
-### Working with the repository:
-
-Cloning this repository is only necessary if you intend to:
-
-- Build the VNCore DLL yourself.
-- Modify or extend the library's source code.
-- Examine the internal implementation.
 
 ## Installation & Packages
 
@@ -64,55 +46,13 @@ dotnet add package VNCore.Godot
 ```
 ### Unity
 Install VNCore.Unity through the Unity Package Manager.
-## Architecture
 
-  VNCore is primarily divided into four components:
+## Documentation
 
-### 1. ScriptCompiler
-
-Namespace: VNCore.Compiler
-
-The ScriptCompiler converts human-readable dialogue scripts into JSON scene data.
-
-It processes script files line by line, interpreting indentation and keywords to distinguish between dialogue, metadata, and choices.
-
-The compiler also supports references to other script files, allowing multiple files to be compiled into separate dialogue branches within the same output.
-
-#### Public API:
-```
-public CompileResult Compile(string filepath, string outputPath); 
-```
-| Parameter | Description |
-|---|---|
-| filepath | Path to the source dialogue .txt script. |
-| outputPath | Destination for the compiled JSON scene file. |
-
-The method returns a CompileResult containing: 
-
-- Success: Whether compilation completed successfully.
-- ErrorMessage: An optional description of the error.
-- Error: The assosciated CompileError value.
-
-Usage Example:
-```
-ScriptCompiler compiler = new ScriptCompiler();
-
-ScriptCompiler.CompileResult result =
-  compiler.Compile("Scripts/Chapter1.txt", "Scenes/Chapter1.json");
-
-if (!result.Success)
-  Console.WriteLine(result.ErrorMessage);
-```
-
-### 2. DialogueManager
-### 3. SaveData
-### 4. SaveManager
-
-## Scripting Language
-
-## Getting Started
-
-## JSON Scene Structure
-
-## Dependencies
-
+- [Getting Started](docs/getting-started.md)
+- [Scripting Language](docs/scripting-language.md)
+- [API Reference](docs/api-reference.md)
+- [Save System](docs/save-system.md)
+- [Architecture](docs/architecture.md)
+- [Unity Integration](docs/integrations/unity.md)
+- [Godot Integration](docs/integrations/godot.md)
