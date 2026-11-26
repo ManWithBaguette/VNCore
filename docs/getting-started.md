@@ -12,11 +12,11 @@ VNCore is intended to be used as a library within other C# projects. The primary
 6. Create a DialogueManager object and load in the scene JSON.
 7. Use DialogueManager APIs to manage dialogue progression during runtime.
 
-Related Documentation:
-[scripting language](scripting-language.md)
-[ScriptCompiler](api/script-compiler.md)
-[DialogueManager](api/dialogue-manager.md)
-[Save System](save-system.md)
+### Related Documentation:
+- [scripting language](scripting-language.md)
+- [ScriptCompiler](api/script-compiler.md)
+- [DialogueManager](api/dialogue-manager.md)
+- [Save System](save-system.md)
 
 ### Working with the repository:
 
