@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../Standard/Standard.csproj"
+    <ProjectReference Include="../VNCore/VNCore.csproj"
                       SetTargetFramework="TargetFramework=net8.0" />
   </ItemGroup>
 
