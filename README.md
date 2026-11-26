@@ -43,6 +43,5 @@ Install VNCore.Unity through the Unity Package Manager.
 - [Scripting Language](docs/scripting-language.md)
 - [API Reference](docs/api-reference.md)
 - [Save System](docs/save-system.md)
-- [Architecture](docs/architecture.md)
 - [Unity Integration](docs/integrations/unity.md)
 - [Godot Integration](docs/integrations/godot.md)
