@@ -5,25 +5,15 @@ VNCore is a dialogue management and scripting library designed for visual novel 
 The library also includes a save data system that allows scripts to store, modify, and evaluate variables during runtime.
 
 ## Features
-```
-Custom Scripting Language: Write dialogue and scene instructions in a human-readable format.
-
-Script Compiler: Converts dialogue scripts into structured JSON files.
-
-Dialogue Management: Handles dialogue progression, scene loading, and unloading.
-
-Branching Dialogue: Supports switching between dialogue branches and external script files.
-
-Player Choices: Supports multiple choices, each with its own metadata and conditions.
-
-Conditional Dialogue: Allows dialogue and choices to be conditionally displayed based on saved variables.
-
-Dynamic Text: Supports variable interpolation within dialogue text.
-
-Save Data: Stores and modifies runtime variables, including arithmetic operations and comparisons.
-
-Event Notifications: Provides events for scene loading, dialogue changes, choice updates, and dialogue completion.
-```
+- Custom Scripting Language: Write dialogue and scene instructions in a human-readable format.
+- Script Compiler: Converts dialogue scripts into structured JSON files.
+- Dialogue Management: Handles dialogue progression, scene loading, and unloading.
+- Branching Dialogue: Supports switching between dialogue branches and external script files.
+- Player Choices: Supports multiple choices, each with its own metadata and conditions.
+- Conditional Dialogue: Allows dialogue and choices to be conditionally displayed based on saved variables.
+- Dynamic Text: Supports variable interpolation within dialogue text.
+- Save Data: Stores and modifies runtime variables, including arithmetic operations and comparisons.
+- Event Notifications: Provides events for scene loading, dialogue changes, choice updates, and dialogue completion.
 
 ## Installation & Packages
 
