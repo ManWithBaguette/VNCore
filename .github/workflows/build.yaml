@@ -26,17 +26,19 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Restore
-        run: dotnet restore ./src/VNCore/VNCore.csproj
+      # Standard Build
+      - name: Build Standard
+        run: dotnet build ./src/VNCore/VNCore.csproj --configuration Release
 
-      - name: Build
-        run: dotnet build ./src/VNCore/VNCore.csproj --configuration Release --no-restore
+      - name: Pack Standard
+        run: dotnet pack ./src/VNCore/VNCore.csproj --configuration Release --output ./artifacts
 
-      - name: Test
-        run: dotnet test ./src/VNCore/VNCore.csproj --configuration Release --no-build
+      # Godot Build
+      - name: Build Godot
+        run: dotnet build ./src/Godot/Godot.csproj --configuration Release
 
-      - name: Pack
-        run: dotnet pack ./src/VNCore/VNCore.csproj --configuration Release --no-build --output ./artifacts
+      - name: Pack Godot
+        run: dotnet pack ./src/Godot/Godot.csproj --configuration Release --output ./artifacts
 
       - name: NuGet login
         uses: NuGet/login@v1
