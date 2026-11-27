@@ -5,7 +5,7 @@ on:
     tags:
       - 'v*'
 
-pretmission:
+permissions:
   contents: read
 
 jobs:
@@ -16,32 +16,32 @@ jobs:
       contents: read
       id-token: write
 
-      steps:
-        - name: Checkout repository
-          uses: actions/checkout@v6
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test --configuration Release --no-build
+
+      - name: Pack
+        run: dotnet pack --configuration Release --no-build --output ./artifacts
+
+      - name: NuGet login
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: ManWithBaguette
         
-        - name: Setup .NET
-          uses: actions/setup-dotnet@v6
-          with:
-            dotnet-version: '10.0.x'
-
-        - name: Restore
-          run: dotnet restore
-
-        - name: Build
-          run: dotnet build --configuration Release --no-restore
-
-        - name: Test
-          run: dotnet test --configuration Release --no-build
-
-        - name: Pack
-          run: dotnet pack --configuration Release --no-build --output ./artifacts
-
-        - name: NuGet login
-          uses: NuGet/login@v1
-          id: login
-          with:
-            user: ManWithBaguette
-          
-        - name: Publish to NuGet
-          run: dotnet NuGet push "./artifacts/*.nupkg" --api-key "${{steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+      - name: Publish to NuGet
+        run: dotnet nuget push "./artifacts/*.nupkg" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
