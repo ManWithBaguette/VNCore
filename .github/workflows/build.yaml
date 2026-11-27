@@ -27,16 +27,16 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore
-        run: dotnet restore ./src/Standard/Standard.csproj
+        run: dotnet restore ./src/VNCore/VNCore.csproj
 
       - name: Build
-        run: dotnet build ./src/Standard/Standard.csproj --configuration Release --no-restore
+        run: dotnet build ./src/VNCore/VNCore.csproj --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test ./src/Standard/Standard.csproj --configuration Release --no-build
+        run: dotnet test ./src/VNCore/VNCore.csproj --configuration Release --no-build
 
       - name: Pack
-        run: dotnet pack ./src/Standard/Standard.csproj --configuration Release --no-build --output ./artifacts
+        run: dotnet pack ./src/VNCore/VNCore.csproj --configuration Release --no-build --output ./artifacts
 
       - name: NuGet login
         uses: NuGet/login@v1

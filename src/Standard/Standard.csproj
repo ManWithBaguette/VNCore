@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
-    <PackageId>VNCoreStandard</PackageId>
+    <PackageId>VNCore</PackageId>
     <Version>1.0.0</Version>
     <Authors>ManWithBaguette</Authors>
     <Description>A dialogue management and scripting library designed for game development.</Description>
